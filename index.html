@@ -7,6 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
@@ -32,30 +33,41 @@
             overflow-x: hidden; 
         }
 
+        /* --- BACKGROUND ANIMATION (Floating Tech) --- */
+        .background-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            overflow: hidden; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .bg-square {
+            position: absolute; bottom: -100px; background: rgba(255, 255, 255, 0.6);
+            border-radius: 10px; animation: floatUp 15s infinite linear;
+        }
+        .bg-square:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-duration: 12s; animation-delay: 0s; }
+        .bg-square:nth-child(2) { width: 40px; height: 40px; left: 20%; animation-duration: 18s; animation-delay: 2s; }
+        .bg-square:nth-child(3) { width: 100px; height: 100px; left: 35%; animation-duration: 25s; animation-delay: 4s; }
+        .bg-square:nth-child(4) { width: 50px; height: 50px; left: 50%; animation-duration: 15s; animation-delay: 0s; }
+        .bg-square:nth-child(5) { width: 90px; height: 90px; left: 65%; animation-duration: 20s; animation-delay: 1s; }
+        .bg-square:nth-child(6) { width: 120px; height: 120px; left: 80%; animation-duration: 30s; animation-delay: 5s; }
+        .bg-square:nth-child(7) { width: 60px; height: 60px; left: 90%; animation-duration: 16s; animation-delay: 3s; }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
         /* --- Custom Toast Notifications --- */
-        #toast-container {
-            position: fixed; top: 20px; right: 20px; z-index: 1060;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .custom-toast {
-            background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            padding: 15px 20px; min-width: 300px; display: flex; align-items: center; gap: 12px;
-            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            border-left: 5px solid var(--primary-blue);
-        }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 1060; display: flex; flex-direction: column; gap: 10px; }
+        .custom-toast { background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); padding: 15px 20px; min-width: 300px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 5px solid var(--primary-blue); }
         .custom-toast.success { border-left-color: var(--success-green); }
         .custom-toast.error { border-left-color: var(--danger-red); }
         .toast-icon { font-size: 1.2rem; }
         .toast-msg { font-weight: 500; font-size: 0.95rem; }
-        
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
         /* Navbar */
-        .navbar { 
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important; 
-            box-shadow: 0 4px 12px rgba(0, 64, 128, 0.15); padding: 0.8rem 0;
-        }
+        .navbar { background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important; box-shadow: 0 4px 12px rgba(0, 64, 128, 0.15); padding: 0.8rem 0; }
         .navbar-brand { color: white !important; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; }
         .logo-box { background: rgba(255,255,255,0.2); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
         .brand-text { letter-spacing: -0.5px; }
@@ -68,8 +80,8 @@
         .hidden { display: none !important; }
 
         /* Login */
-        #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-container { width: 100%; max-width: 400px; padding: 35px 30px; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 64, 128, 0.1); border-top: 6px solid var(--primary-blue); margin: 20px auto; }
+        #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 10; }
+        .login-container { width: 100%; max-width: 400px; padding: 35px 30px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 64, 128, 0.15); border-top: 6px solid var(--primary-blue); margin: 20px auto; }
 
         /* Inputs & Buttons */
         .form-control, .form-select { border-radius: 8px; border: 1px solid var(--border-light); padding: 10px 15px; background-color: #f8fafc; font-size: 16px; }
@@ -98,10 +110,8 @@
         .forecast-box { background-color: #fff8f0; border: 1px dashed var(--warning-orange); padding: 5px; border-radius: 6px; margin-top: 10px; color: #856404; font-size: 0.85rem; }
         .forecast-val { font-weight: 800; color: var(--warning-orange); font-size: 1rem; }
 
-        /* Progress Bar in Card */
         .card-progress-container { width: 100%; background-color: #e9ecef; border-radius: 4px; height: 6px; margin-top: 10px; overflow: hidden; }
         .card-progress-bar { height: 100%; background-color: var(--success-green); width: 0%; transition: width 0.5s ease; }
-        .progress-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; display: block; }
 
         /* Nav & Action Bar */
         #student-subject-select { background-color: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; font-weight: 600; text-align: center; }
@@ -141,6 +151,13 @@
     </style>
 </head>
 <body>
+
+    <!-- Animation Background -->
+    <div class="background-animation">
+        <div class="bg-square"></div><div class="bg-square"></div><div class="bg-square"></div>
+        <div class="bg-square"></div><div class="bg-square"></div><div class="bg-square"></div>
+        <div class="bg-square"></div>
+    </div>
 
     <!-- Toast Container -->
     <div id="toast-container"></div>
@@ -306,7 +323,6 @@
                         <div class="grade-value" id="s-prelim">--</div>
                         <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-prelim-w">--%</div>
                         <div class="forecast-box hidden" id="f-prelim-box"><div class="forecast-val" id="f-prelim">--</div></div>
-                        <!-- Progress Bar Container (Hidden by default, shown via JS) -->
                         <div class="card-progress-container hidden" id="p-prelim-bar-box">
                             <div class="card-progress-bar" id="p-prelim-bar"></div>
                         </div>
@@ -516,7 +532,18 @@
                     const snapshot = await window.getDocs(q);
                     if (!snapshot.empty) {
                         allStudentSubjects = [];
-                        snapshot.forEach(doc => allStudentSubjects.push(doc.data()));
+                        snapshot.forEach(doc => {
+                            // Filter out dropped subjects!
+                            const d = doc.data();
+                            if (d.status !== "Dropped") {
+                                allStudentSubjects.push(d);
+                            }
+                        });
+                        
+                        if (allStudentSubjects.length === 0) {
+                            throw new Error("No active subjects found.");
+                        }
+
                         document.getElementById('login-section').classList.add('hidden');
                         document.getElementById('student-section').classList.remove('hidden');
                         initStudentPortal();
@@ -825,10 +852,9 @@
             const wP = globalWeights.prelim/100;
             const wM = globalWeights.midterm/100;
             const wF = globalWeights.finals/100;
-            let cardGrade = null;
             if (p && m && f) {
-                cardGrade = Math.round((p * wP) + (m * wM) + (f * wF));
-                document.getElementById('s-card').innerText = cardGrade;
+                const card = Math.round((p * wP) + (m * wM) + (f * wF));
+                document.getElementById('s-card').innerText = card;
             } else { document.getElementById('s-card').innerText = "--"; }
             
             showStudentTerm('prelim', document.querySelector('.nav-link.active'));
