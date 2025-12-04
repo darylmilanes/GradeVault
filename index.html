@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GradeVault Portal</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
         :root {
@@ -28,124 +29,175 @@
             color: var(--text-main); 
             font-family: 'Inter', sans-serif; 
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden; 
         }
+
+        /* --- Custom Toast Notifications --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 1060;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .custom-toast {
+            background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            padding: 15px 20px; min-width: 300px; display: flex; align-items: center; gap: 12px;
+            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border-left: 5px solid var(--primary-blue);
+        }
+        .custom-toast.success { border-left-color: var(--success-green); }
+        .custom-toast.error { border-left-color: var(--danger-red); }
+        .toast-icon { font-size: 1.2rem; }
+        .toast-msg { font-weight: 500; font-size: 0.95rem; }
+        
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
         /* Navbar */
         .navbar { 
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important; 
-            box-shadow: 0 4px 12px rgba(0, 64, 128, 0.15);
-            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 64, 128, 0.15); padding: 0.8rem 0;
         }
-        .navbar-brand { color: white !important; font-weight: 700; letter-spacing: -0.5px; font-size: 1.3rem; }
-        .btn-outline-light { border-radius: 50px; padding: 5px 20px; font-size: 0.85rem; border-width: 1px; transition: all 0.3s ease; }
-        .btn-outline-light:hover { background: rgba(255,255,255,0.1); color: white; border-color: white; transform: translateY(-1px); }
+        .navbar-brand { color: white !important; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; }
+        .logo-box { background: rgba(255,255,255,0.2); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+        .brand-text { letter-spacing: -0.5px; }
+        .brand-subtitle { font-weight: 300; opacity: 0.9; font-size: 0.85em; margin-left: 4px; }
+        .btn-outline-light { border-radius: 50px; font-size: 0.8rem; }
+        .icon-btn { border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; }
 
         /* Cards */
-        .card { 
-            border: none; border-radius: 12px; box-shadow: var(--card-shadow); 
-            background-color: white; transition: transform 0.2s ease, box-shadow 0.2s ease; margin-bottom: 1.5rem;
-        }
-        .grade-card:hover { transform: translateY(-3px); box-shadow: var(--hover-shadow); }
+        .card { border: none; border-radius: 12px; box-shadow: var(--card-shadow); background-color: white; margin-bottom: 1rem; }
         .hidden { display: none !important; }
 
         /* Login */
-        #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
-        .login-container { width: 100%; max-width: 420px; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 64, 128, 0.08); border-top: 6px solid var(--primary-blue); }
+        #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { width: 100%; max-width: 400px; padding: 35px 30px; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 64, 128, 0.1); border-top: 6px solid var(--primary-blue); margin: 20px auto; }
 
         /* Inputs & Buttons */
-        .form-control, .form-select { border-radius: 8px; border: 1px solid var(--border-light); padding: 10px 15px; background-color: #f8fafc; }
+        .form-control, .form-select { border-radius: 8px; border: 1px solid var(--border-light); padding: 10px 15px; background-color: #f8fafc; font-size: 16px; }
         .form-control:focus, .form-select:focus { background-color: white; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1); }
         .btn { border-radius: 8px; font-weight: 500; padding: 10px 20px; transition: all 0.2s; }
-        .btn-primary { background-color: var(--primary-blue); border: none; }
-        .btn-primary:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
-
+        
         /* Tables */
-        .table-responsive { border-radius: 12px; overflow: hidden; border: 1px solid var(--border-light); }
-        .table thead { background-color: #f1f5f9; }
-        .table th { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; border-bottom: 2px solid var(--border-light); padding: 15px; vertical-align: middle; }
-        .table td { vertical-align: middle; padding: 12px 15px; border-color: var(--border-light); color: var(--text-main); }
-        .sticky-col { position: sticky; left: 0; background-color: white; z-index: 10; border-right: 2px solid var(--border-light) !important; font-weight: 600; color: var(--primary-blue); }
+        .table-responsive { border-radius: 12px; border: 1px solid var(--border-light); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table th { font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 12px; white-space: nowrap; }
+        .table td { padding: 10px 12px; vertical-align: middle; white-space: nowrap; }
+        .sticky-col { position: sticky; left: 0; background-color: white; z-index: 10; border-right: 2px solid var(--border-light) !important; color: var(--primary-blue); font-weight: 600; }
 
-        /* Inputs */
+        /* Inputs & Grades */
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .table-input { width: 75px; text-align: center; border: 1px solid transparent; background: transparent; border-radius: 4px; font-weight: 500; font-size: 1rem; padding: 4px 0; }
-        .table-input:hover { background-color: #f8fafc; border-color: var(--border-light); }
+        .table-input { width: 60px; text-align: center; border: 1px solid transparent; background: transparent; border-radius: 4px; font-weight: 600; font-size: 1rem; padding: 5px 0; }
         .table-input:focus { border-color: var(--primary-blue); background-color: white; outline: none; }
-
-        /* Grades & Badges */
-        .grade-cell { font-weight: 700; font-size: 1rem; text-align: center; color: var(--text-main); }
+        .grade-cell { font-weight: 800; font-size: 1rem; text-align: center; }
         .failing-grade { color: var(--danger-red); background-color: #fff5f5; border-radius: 4px; }
-        .badge { padding: 6px 12px; border-radius: 30px; font-weight: 500; }
+        .badge { padding: 5px 10px; border-radius: 30px; font-weight: 500; }
 
         /* Student Portal */
-        .grade-card { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 25px; border-top: 5px solid var(--primary-blue); }
-        .grade-value { font-size: 3rem; font-weight: 800; color: var(--primary-blue); line-height: 1; margin-bottom: 5px; }
-        .forecast-box { background-color: #fff8f0; border: 1px dashed var(--warning-orange); padding: 8px; border-radius: 6px; margin-top: 15px; color: #856404; }
-        .forecast-val { font-weight: 800; color: var(--warning-orange); font-size: 1.1rem; }
-
-        /* Subject Select In Navbar */
-        #student-subject-select { 
-            background-color: rgba(255,255,255,0.1); 
-            border: 1px solid rgba(255,255,255,0.2); 
-            color: white; 
-            font-weight: 600;
-        }
-        #student-subject-select:focus { background-color: rgba(255,255,255,0.2); border-color: white; color: white; }
-        #student-subject-select option { background-color: var(--primary-blue); color: white; }
-
-        /* Attendance */
-        .date-header-input { border: none; background: transparent; font-weight: 700; color: var(--primary-blue); width: 80px; text-align: center; font-size: 0.8rem; }
-        .att-select { border: none; background: transparent; font-weight: 600; cursor: pointer; text-align: center; -webkit-appearance: none; appearance: none; }
-        .att-present { color: var(--success-green); } .att-absent { color: var(--danger-red); } .att-late { color: var(--warning-orange); } .att-excused { color: var(--primary-blue); opacity: 0.7; }
-
-        /* Nav Tabs */
-        .nav-tabs { border-bottom: 2px solid var(--border-light); margin-bottom: 20px; }
-        .nav-link { border: none; color: var(--text-muted); font-weight: 600; padding: 10px 20px; transition: all 0.2s; }
-        .nav-link:hover { color: var(--primary-blue); }
-        .nav-link.active { color: var(--primary-blue); border-bottom: 3px solid var(--primary-blue); background: transparent; }
+        .grade-card { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 15px; border: 1px solid var(--border-light); border-top: 4px solid var(--primary-blue); text-align: center; position: relative; }
+        .grade-value { font-size: 2.2rem; font-weight: 800; color: var(--primary-blue); line-height: 1.1; margin-bottom: 5px; }
+        .grade-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; }
         
+        .forecast-box { background-color: #fff8f0; border: 1px dashed var(--warning-orange); padding: 5px; border-radius: 6px; margin-top: 10px; color: #856404; font-size: 0.85rem; }
+        .forecast-val { font-weight: 800; color: var(--warning-orange); font-size: 1rem; }
+
+        /* Progress Bar in Card */
+        .card-progress-container { width: 100%; background-color: #e9ecef; border-radius: 4px; height: 6px; margin-top: 10px; overflow: hidden; }
+        .card-progress-bar { height: 100%; background-color: var(--success-green); width: 0%; transition: width 0.5s ease; }
+        .progress-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; display: block; }
+
+        /* Nav & Action Bar */
+        #student-subject-select { background-color: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; font-weight: 600; text-align: center; }
+        #student-subject-select option { background-color: var(--primary-blue); color: white; }
+        .nav-tabs { border-bottom: 2px solid var(--border-light); margin-bottom: 15px; flex-wrap: nowrap; overflow-x: auto; }
+        .nav-link { white-space: nowrap; color: var(--text-muted); font-weight: 600; border: none; padding: 10px 20px; }
+        .nav-link.active { color: var(--primary-blue); border-bottom: 3px solid var(--primary-blue); background: transparent; }
         .action-bar { border-top: 1px solid var(--border-light); background: #f8f9fa; border-radius: 0 0 12px 12px; }
 
+        #target-grade-input::placeholder { color: #d1d5db; font-weight: 400; }
+
+        .date-header-input { border: none; background: transparent; font-weight: 700; color: var(--primary-blue); width: 80px; text-align: center; font-size: 0.8rem; }
+        .att-cell { border-left: 1px solid rgba(0,0,0,0.05); } 
+        .att-select { border: none; background: transparent; font-weight: 600; cursor: pointer; text-align: center; -webkit-appearance: none; appearance: none; width: 100%; }
+        .att-present { color: var(--success-green); } .att-absent { color: var(--danger-red); } .att-late { color: var(--warning-orange); } .att-excused { color: var(--primary-blue); opacity: 0.7; }
+
+        .progress { height: 10px; border-radius: 5px; background-color: #e9ecef; overflow: hidden; margin-top: 10px; }
+        .progress-bar { background-color: var(--primary-blue); transition: width 0.3s ease; }
+
+        @media (min-width: 992px) {
+            #student-subject-select { width: auto; min-width: 250px; }
+            #student-name-display { margin-top: 0px; opacity: 0.9; }
+        }
+        @media (max-width: 991px) {
+            .container-fluid { padding-left: 15px; padding-right: 15px; }
+            .card .row.g-3 > div { width: 100%; margin-bottom: 10px; }
+            .action-bar { flex-direction: column; gap: 10px; }
+            .action-bar button { width: 100% !important; }
+            #attendance-buttons { flex-direction: column; width: 100%; gap: 10px; }
+            .col-sm-6 { width: 50%; }
+            .target-calc-container { flex-direction: column; align-items: flex-start !important; }
+            .target-calc-input { width: 100% !important; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+            .navbar-brand { font-size: 1.1rem; }
+            #student-subject-select { width: 100%; margin-top: 5px; }
+            #student-name-display { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.9); margin-top: 5px; display: block; width: 100%; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="login-section" class="container">
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- 1. LOGIN SECTION -->
+    <div id="login-section">
         <div class="login-container">
-            <h3 class="text-center" style="font-weight: 800; color: var(--primary-blue); letter-spacing: -1px;">GradeVault</h3>
-            <div class="mb-4 mt-4">
+            <h3 class="text-center mb-4" style="font-weight: 800; color: var(--primary-blue); display:flex; align-items:center; justify-content:center; gap:10px;">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px; font-size:1.2rem;">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <div>GradeVault</div>
+            </h3>
+            <div class="mb-3">
                 <label class="form-label">User ID / Email</label>
-                <input type="text" id="login-uid" class="form-control" placeholder="Student ID or Admin Email">
+                <input type="text" id="login-uid" class="form-control" placeholder="ID or Email" onkeydown="if(event.key==='Enter') handleLogin()">
             </div>
             <div class="mb-4">
                 <label class="form-label">Password</label>
-                <input type="password" id="login-pass" class="form-control" placeholder="••••••••">
+                <input type="password" id="login-pass" class="form-control" placeholder="••••••••" onkeydown="if(event.key==='Enter') handleLogin()">
             </div>
-            <button onclick="handleLogin()" class="btn btn-primary w-100 py-2">Sign In</button>
-            <p id="login-error" class="text-danger mt-3 text-center small fw-bold"></p>
+            <button id="btn-login" onclick="handleLogin()" class="btn btn-primary w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
+                <span>Sign In</span>
+                <div id="login-spinner" class="spinner-border spinner-border-sm text-white d-none" role="status"></div>
+            </button>
         </div>
     </div>
 
+    <!-- 2. TEACHER PORTAL -->
     <div id="teacher-section" class="hidden">
-        <nav class="navbar navbar-expand-lg mb-4">
-            <div class="container-fluid px-4">
-                <span class="navbar-brand">GradeVault <span style="font-weight:300; opacity:0.8;">| Teacher</span></span>
-                <button onclick="logout()" class="btn btn-outline-light">Sign Out</button>
+        <nav class="navbar navbar-expand-lg mb-3">
+            <div class="container-fluid px-3 d-flex justify-content-between">
+                <span class="navbar-brand">
+                    <div class="logo-box"><i class="bi bi-mortarboard-fill"></i></div>
+                    <span class="brand-text">GradeVault</span>
+                    <span class="brand-subtitle">Teacher</span>
+                </span>
+                <button onclick="logout()" class="btn btn-outline-light icon-btn" title="Sign Out"><i class="bi bi-power"></i></button>
             </div>
         </nav>
-        <div class="container-fluid px-4">
-            <div class="row mb-4">
+        <div class="container-fluid">
+            <div class="row mb-3">
                 <div class="col-md-12">
-                    <div class="card p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                            <h5 class="mb-0 text-primary fw-bold">Class Management</h5>
+                    <div class="card p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                            <h6 class="mb-0 text-primary fw-bold">Class Management</h6>
                             <div class="d-flex gap-2">
-                                <button onclick="document.getElementById('import-modal').classList.remove('hidden')" class="btn btn-sm btn-outline-secondary fw-bold">📂 Import CSV</button>
-                                <button onclick="openSettingsModal()" class="btn btn-sm btn-outline-primary fw-bold">⚙️ Configuration</button>
+                                <button onclick="document.getElementById('import-modal').classList.remove('hidden')" class="btn btn-sm btn-outline-secondary fw-bold" title="Import CSV">
+                                    <i class="bi bi-folder-plus"></i> <span class="d-none d-md-inline">Import</span>
+                                </button>
+                                <button onclick="openSettingsModal()" class="btn btn-sm btn-outline-primary fw-bold" title="Configuration">
+                                    <i class="bi bi-gear"></i> <span class="d-none d-md-inline">Config</span>
+                                </button>
                             </div>
                         </div>
                         <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
+                            <div class="col-md-3 col-12">
                                 <label class="form-label">Term</label>
                                 <select id="term-select" class="form-select">
                                     <option value="prelim">Prelim</option>
@@ -153,11 +205,11 @@
                                     <option value="finals">Finals</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 col-12">
                                 <label class="form-label">Section</label>
                                 <select id="section-select" class="form-select"><option value="">Loading...</option></select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3 col-12">
                                 <label class="form-label">View Mode</label>
                                 <select id="view-mode" class="form-select" onchange="toggleTeacherButtons()">
                                     <option value="list">Student List</option>
@@ -165,8 +217,8 @@
                                     <option value="attendance">Attendance</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <button onclick="loadClassList()" class="btn btn-primary w-100">Load List</button>
+                            <div class="col-md-2 col-12">
+                                <button onclick="loadClassList()" class="btn btn-primary w-100 fw-bold">Load List</button>
                             </div>
                         </div>
                     </div>
@@ -174,10 +226,10 @@
             </div>
 
             <div id="results-area" class="hidden">
-                <div class="card p-0 overflow-hidden shadow-lg">
+                <div class="card p-0 overflow-hidden shadow-sm">
                     <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
                         <h6 id="table-title" class="m-0 fw-bold text-primary">Class List</h6>
-                        <span class="badge bg-light text-dark border">Live Data</span>
+                        <span class="badge bg-light text-dark border">Live</span>
                     </div>
                     <div class="table-responsive border-0">
                         <table class="table table-hover mb-0" id="data-table">
@@ -185,13 +237,13 @@
                             <tbody id="table-body"></tbody>
                         </table>
                     </div>
-                    <div id="bottom-action-bar" class="action-bar p-3 d-flex justify-content-end gap-3 hidden">
+                    <div id="bottom-action-bar" class="action-bar p-3 d-flex justify-content-end gap-2 hidden">
                         <div id="scores-buttons" class="hidden w-100 d-flex justify-content-end">
-                            <button onclick="saveScores()" class="btn btn-success px-5 fw-bold shadow-sm">💾 Save All Scores</button>
+                            <button onclick="saveScores()" class="btn btn-success px-4 fw-bold shadow-sm">💾 Save Scores</button>
                         </div>
                         <div id="attendance-buttons" class="hidden w-100 d-flex justify-content-between align-items-center">
-                            <button onclick="addDateColumn()" class="btn btn-outline-primary fw-bold">+ Add New Date</button>
-                            <button onclick="saveAttendance()" class="btn btn-success px-5 fw-bold shadow-sm">💾 Save Attendance Log</button>
+                            <button onclick="addDateColumn()" class="btn btn-outline-primary fw-bold">+ Date</button>
+                            <button onclick="saveAttendance()" class="btn btn-success px-4 fw-bold shadow-sm">💾 Save Log</button>
                         </div>
                     </div>
                 </div>
@@ -199,147 +251,176 @@
         </div>
     </div>
 
+    <!-- 3. STUDENT PORTAL -->
     <div id="student-section" class="hidden">
-        <nav class="navbar navbar-expand-lg mb-5">
-            <div class="container px-4">
-                <span class="navbar-brand">GradeVault</span>
-                
-                <button class="navbar-toggler text-white border-white" type="button" data-bs-toggle="collapse" data-bs-target="#studentNav">
-                    <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="studentNav">
-                    <div class="mx-auto d-flex align-items-center gap-3 my-2 my-lg-0">
-                        <span class="navbar-text text-white small text-uppercase" style="opacity: 0.8;">Viewing:</span>
-                        <select id="student-subject-select" class="form-select form-select-sm w-auto" onchange="switchStudentSubject()">
-                            </select>
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container px-3">
+                <div class="row w-100 align-items-center gx-0">
+                    <div class="col-lg-6 col-12 d-flex flex-column mb-2 mb-lg-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="navbar-brand">
+                                <div class="logo-box"><i class="bi bi-mortarboard-fill"></i></div>
+                                <span class="brand-text">GradeVault</span>
+                                <span class="brand-subtitle">Student</span>
+                            </span>
+                            <button onclick="logout()" class="btn btn-outline-light icon-btn d-lg-none"><i class="bi bi-power"></i></button>
+                        </div>
+                        <div class="text-white small fw-medium" id="student-name-display" style="line-height:1.2;">Loading...</div>
                     </div>
-
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="navbar-text d-none d-md-block text-white" id="student-name-display"></span>
-                        <button onclick="logout()" class="btn btn-outline-light btn-sm">Sign Out</button>
+                    <div class="col-lg-6 col-12 d-flex justify-content-lg-end justify-content-center align-items-center gap-3">
+                        <select id="student-subject-select" class="form-select form-select-sm" onchange="switchStudentSubject()"></select>
+                        <button onclick="logout()" class="btn btn-outline-light icon-btn d-none d-lg-flex"><i class="bi bi-power"></i></button>
                     </div>
                 </div>
             </div>
         </nav>
-        <div class="container">
-            <div class="row mb-5">
+        
+        <div class="container px-3">
+            <div class="row mb-4">
                 <div class="col-md-12">
-                    <div class="card p-4 border-0 shadow-sm" style="background: linear-gradient(to right, #ffffff, #f8faff);">
-                        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                    <div class="card p-3 border-0 shadow-sm" style="background: linear-gradient(to right, #ffffff, #f8faff);">
+                        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 target-calc-container">
                             <div class="d-flex align-items-center gap-3">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px; font-size:1.2rem;">🎯</div>
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:42px; height:42px; font-size:1.3rem;">
+                                    <i class="bi bi-calculator"></i>
+                                </div>
                                 <div>
-                                    <h5 class="mb-0 fw-bold text-primary">Target Grade Calculator</h5>
-                                    <p class="mb-0 text-muted small">Set a goal to see required future grades.</p>
+                                    <h6 class="mb-0 fw-bold text-primary">Target Calculator</h6>
+                                    <p class="mb-0 text-muted small">Set goal to see required grades.</p>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold text-muted">MY GOAL:</span>
-                                <input type="number" id="target-grade-input" class="form-control form-control-lg text-center fw-bold text-primary" style="width: 100px;" placeholder="90" oninput="calculateForecast()">
+                            <div class="target-calc-input d-flex align-items-center gap-2">
+                                <span class="fw-bold text-muted small">MY GOAL:</span>
+                                <input type="number" id="target-grade-input" class="form-control fw-bold text-primary text-center" style="width: 80px;" placeholder="90" oninput="calculateForecast()">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row mb-5 g-4">
-                <div class="col-md-3 col-sm-6">
+            
+            <!-- Grade Cards with Progress Bars -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-3 col-sm-6 col-6">
                     <div class="card grade-card">
-                        <div class="grade-label">Prelim Grade</div>
+                        <div class="grade-label">Prelim</div>
                         <div class="grade-value" id="s-prelim">--</div>
-                        <div class="badge bg-light text-muted border fw-normal" id="lbl-prelim-w">--% Weight</div>
+                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-prelim-w">--%</div>
+                        <div class="forecast-box hidden" id="f-prelim-box"><div class="forecast-val" id="f-prelim">--</div></div>
+                        <!-- Progress Bar Container (Hidden by default, shown via JS) -->
+                        <div class="card-progress-container hidden" id="p-prelim-bar-box">
+                            <div class="card-progress-bar" id="p-prelim-bar"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-3 col-sm-6 col-6">
                     <div class="card grade-card">
-                        <div class="grade-label">Midterm Grade</div>
+                        <div class="grade-label">Midterm</div>
                         <div class="grade-value" id="s-midterm">--</div>
-                        <div class="badge bg-light text-muted border fw-normal" id="lbl-mid-w">--% Weight</div>
-                        <div class="forecast-box hidden" id="f-midterm-box"><small class="text-uppercase fw-bold" style="font-size:0.7rem;">Required:</small> <div class="forecast-val" id="f-midterm">--</div></div>
+                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-mid-w">--%</div>
+                        <div class="forecast-box hidden" id="f-midterm-box"><div class="forecast-val" id="f-midterm">--</div></div>
+                        <div class="card-progress-container hidden" id="p-midterm-bar-box">
+                            <div class="card-progress-bar" id="p-midterm-bar"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-3 col-sm-6 col-6">
                     <div class="card grade-card">
-                        <div class="grade-label">Finals Grade</div>
+                        <div class="grade-label">Finals</div>
                         <div class="grade-value" id="s-finals">--</div>
-                        <div class="badge bg-light text-muted border fw-normal" id="lbl-fin-w">--% Weight</div>
-                        <div class="forecast-box hidden" id="f-finals-box"><small class="text-uppercase fw-bold" style="font-size:0.7rem;">Required:</small> <div class="forecast-val" id="f-finals">--</div></div>
+                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-fin-w">--%</div>
+                        <div class="forecast-box hidden" id="f-finals-box"><div class="forecast-val" id="f-finals">--</div></div>
+                        <div class="card-progress-container hidden" id="p-finals-bar-box">
+                            <div class="card-progress-bar" id="p-finals-bar"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6">
+                <div class="col-md-3 col-sm-6 col-6">
                     <div class="card grade-card" style="border-top-color: var(--success-green); background: #f0fff4;">
-                        <div class="grade-label text-success">Total Card Grade</div>
+                        <div class="grade-label text-success">Total</div>
                         <div class="grade-value text-success" id="s-card">--</div>
-                        <div class="small text-muted mt-2">Final Computed</div>
+                        <div class="small text-muted mt-1" style="font-size:0.7em">Final Grade</div>
+                        <div class="card-progress-container hidden" id="p-card-bar-box">
+                            <div class="card-progress-bar" id="p-card-bar"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+            
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card p-4">
-                        <h5 class="mb-4 fw-bold text-primary">Performance Breakdown</h5>
-                        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                    <div class="card p-3">
+                        <h6 class="mb-3 fw-bold text-primary">Breakdown</h6>
+                        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
                             <li class="nav-item"><button class="nav-link active" onclick="showStudentTerm('prelim', this)">Prelim</button></li>
                             <li class="nav-item"><button class="nav-link" onclick="showStudentTerm('midterm', this)">Midterm</button></li>
                             <li class="nav-item"><button class="nav-link" onclick="showStudentTerm('finals', this)">Finals</button></li>
                         </ul>
-                        <div id="student-term-detail" class="fade-in"><p class="text-muted text-center py-5">Loading details...</p></div>
+                        <div id="student-term-detail" class="fade-in"><p class="text-muted text-center py-4 small">Select a term...</p></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODALS -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold">⚙️ Grade Configuration</h5>
+                    <h6 class="modal-title fw-bold">⚙️ Configuration</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <p class="text-muted small mb-4">Adjust how grades are computed. Sections must total 100%.</p>
                     <h6 class="text-primary fw-bold text-uppercase small mb-3">Component Weights (%)</h6>
                     <div class="row g-3 mb-4">
-                        <div class="col-6"><label class="form-label">Quizzes</label><input type="number" id="w-quiz" class="form-control"></div>
-                        <div class="col-6"><label class="form-label">Projects</label><input type="number" id="w-proj" class="form-control"></div>
-                        <div class="col-6"><label class="form-label">Exams</label><input type="number" id="w-exam" class="form-control"></div>
-                        <div class="col-6"><label class="form-label">Attendance</label><input type="number" id="w-att" class="form-control"></div>
+                        <div class="col-6"><label class="form-label small">Quizzes</label><input type="number" id="w-quiz" class="form-control"></div>
+                        <div class="col-6"><label class="form-label small">Projects</label><input type="number" id="w-proj" class="form-control"></div>
+                        <div class="col-6"><label class="form-label small">Exams</label><input type="number" id="w-exam" class="form-control"></div>
+                        <div class="col-6"><label class="form-label small">Attendance</label><input type="number" id="w-att" class="form-control"></div>
                     </div>
                     <h6 class="text-primary fw-bold text-uppercase small mb-3">Term Weights (%)</h6>
                     <div class="row g-3">
-                        <div class="col-4"><label class="form-label">Prelim</label><input type="number" id="w-prelim" class="form-control"></div>
-                        <div class="col-4"><label class="form-label">Midterm</label><input type="number" id="w-mid" class="form-control"></div>
-                        <div class="col-4"><label class="form-label">Finals</label><input type="number" id="w-fin" class="form-control"></div>
+                        <div class="col-4"><label class="form-label small">Prelim</label><input type="number" id="w-prelim" class="form-control"></div>
+                        <div class="col-4"><label class="form-label small">Midterm</label><input type="number" id="w-mid" class="form-control"></div>
+                        <div class="col-4"><label class="form-label small">Finals</label><input type="number" id="w-fin" class="form-control"></div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary px-4" onclick="saveSettings()">Save Changes</button>
+                <div class="modal-footer bg-light p-2">
+                    <button type="button" class="btn btn-primary w-100" onclick="saveSettings()">Save Configuration</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="import-modal" class="card p-4 hidden shadow-lg" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:500px; z-index:1050; border-top: 5px solid var(--primary-blue);">
-        <h5 class="mb-3 fw-bold">Import Student Data</h5>
+    <div id="import-modal" class="card p-4 hidden shadow-lg" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:400px; z-index:1050; border-top: 5px solid var(--primary-blue);">
+        <h6 class="mb-3 fw-bold">Import Student Data</h6>
         <div class="mb-3">
             <input type="file" id="csv-file" accept=".csv" class="form-control">
-            <div class="form-text">Select your formatted CSV file.</div>
+            <div class="form-text small">Select formatted CSV.</div>
         </div>
+        
+        <div id="import-progress-container" class="hidden mb-3">
+            <div class="d-flex justify-content-between small mb-1">
+                <span>Uploading...</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress">
+                <div id="import-progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-end gap-2">
-            <button onclick="document.getElementById('import-modal').classList.add('hidden')" class="btn btn-light">Cancel</button>
-            <button onclick="processCSV()" class="btn btn-primary">Upload Data</button>
+            <button onclick="document.getElementById('import-modal').classList.add('hidden')" class="btn btn-light btn-sm">Cancel</button>
+            <button onclick="processCSV()" class="btn btn-primary btn-sm">Upload</button>
         </div>
-        <div id="upload-status" class="mt-3 small"></div>
     </div>
 
     <div class="modal fade" id="attModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content border-0">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title fw-bold text-primary">Attendance Log</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-light py-2">
+                    <h6 class="modal-title fw-bold text-primary">Attendance Log</h6>
+                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-0" id="att-modal-body"></div>
             </div>
@@ -381,13 +462,11 @@
     </script>
 
     <script>
-        // --- GLOBAL VARS ---
         let currentStudents = []; 
         let currentTerm = "";
         let existingDates = [];
-        
-        let allStudentSubjects = [];    // ALL subjects for the logged-in student
-        let activeStudentSubject = null; // The currently selected subject to display
+        let allStudentSubjects = [];
+        let activeStudentSubject = null;
 
         // ======================================================
         // PASTE YOUR ADMIN UID HERE
@@ -397,44 +476,58 @@
 
         let globalWeights = { quiz: 20, project: 30, exam: 40, attendance: 10, prelim: 25, midterm: 35, finals: 40 };
 
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            const icon = type === 'success' ? 'bi-check-circle-fill text-success' : 'bi-exclamation-triangle-fill text-danger';
+            toast.innerHTML = `<i class="bi ${icon} toast-icon"></i><div class="toast-msg">${msg}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         async function handleLogin() {
             const uidInput = document.getElementById('login-uid').value.trim();
             const passInput = document.getElementById('login-pass').value.trim();
-            const errorMsg = document.getElementById('login-error');
-            errorMsg.innerText = "Verifying credentials...";
+            const btn = document.getElementById('btn-login');
+            const spinner = document.getElementById('login-spinner');
 
-            if (!uidInput || !passInput) { errorMsg.innerText = "Please enter credentials."; return; }
+            if (!uidInput || !passInput) { showToast("Enter credentials", "error"); return; }
+            
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+
             await fetchSettings();
 
             try {
                 if (uidInput.includes("@")) {
                     const userCredential = await window.signInWithEmailAndPassword(window.auth, uidInput, passInput);
-                    const user = userCredential.user;
-                    if (user.uid === ADMIN_UID) {
+                    if (userCredential.user.uid === ADMIN_UID) {
                         document.getElementById('login-section').classList.add('hidden');
                         document.getElementById('teacher-section').classList.remove('hidden');
                         await fetchSectionsForDropdown();
-                    } else { errorMsg.innerText = "Access Denied."; window.signOut(window.auth); }
+                        showToast("Welcome, Admin!");
+                    } else { throw new Error("Access Denied"); }
                 } else {
-                    const q = window.query(window.collection(window.db, "students"), 
-                                           window.where("uid", "==", uidInput),
-                                           window.where("password", "==", passInput));
+                    const q = window.query(window.collection(window.db, "students"), window.where("uid", "==", uidInput), window.where("password", "==", passInput));
                     const snapshot = await window.getDocs(q);
-                    
                     if (!snapshot.empty) {
-                        // Store ALL matching subjects
                         allStudentSubjects = [];
-                        snapshot.forEach(doc => {
-                            allStudentSubjects.push(doc.data());
-                        });
-
+                        snapshot.forEach(doc => allStudentSubjects.push(doc.data()));
                         document.getElementById('login-section').classList.add('hidden');
                         document.getElementById('student-section').classList.remove('hidden');
-                        
                         initStudentPortal();
-                    } else { errorMsg.innerText = "Invalid credentials."; }
+                        showToast("Welcome Student!");
+                    } else { throw new Error("Invalid Credentials"); }
                 }
-            } catch (error) { errorMsg.innerText = "Login Failed: " + error.message; }
+            } catch (error) { 
+                showToast(error.message, "error"); 
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            }
         }
 
         function logout() { window.signOut(window.auth).then(() => location.reload()).catch(() => location.reload()); }
@@ -466,16 +559,15 @@
             };
             const compTotal = newWeights.quiz + newWeights.project + newWeights.exam + newWeights.attendance;
             const termTotal = newWeights.prelim + newWeights.midterm + newWeights.finals;
-            if (compTotal !== 100) { alert(`Components total ${compTotal}%, must be 100%.`); return; }
-            if (termTotal !== 100) { alert(`Term grades total ${termTotal}%, must be 100%.`); return; }
+            if (compTotal !== 100) { showToast(`Components must be 100%`, "error"); return; }
+            if (termTotal !== 100) { showToast(`Term Weights must be 100%`, "error"); return; }
             try {
                 await window.setDoc(window.doc(window.db, "settings", "config"), newWeights);
                 globalWeights = newWeights;
-                alert("Configuration Saved.");
+                showToast("Configuration Saved");
                 bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
-                // Refresh student view if active
                 if(activeStudentSubject) renderStudentPage(activeStudentSubject);
-            } catch (e) { alert("Error: " + e.message); }
+            } catch (e) { showToast(e.message, "error"); }
         }
         function toggleTeacherButtons() {
             const mode = document.getElementById('view-mode').value;
@@ -504,7 +596,7 @@
             const section = document.getElementById('section-select').value;
             currentTerm = document.getElementById('term-select').value;
             const mode = document.getElementById('view-mode').value;
-            if (!section) { alert("Please select a section."); return; }
+            if (!section) { showToast("Select a section", "error"); return; }
             toggleTeacherButtons();
             const q = window.query(window.collection(window.db, "students"), window.where("section", "==", section));
             const snapshot = await window.getDocs(q);
@@ -518,22 +610,40 @@
                         Object.keys(s.attendance_logs[currentTerm]).forEach(d => dateSet.add(d));
                 });
                 existingDates = Array.from(dateSet).sort();
+                const minCols = 10;
+                while (existingDates.length < minCols) { existingDates.push(""); }
             }
             renderTable(currentStudents, mode, currentTerm);
         }
+        
+        window.handleTableEnter = function(e, input) {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const td = input.closest('td');
+            const tr = td.closest('tr');
+            const colIndex = Array.from(tr.children).indexOf(td);
+            const nextTr = tr.nextElementSibling;
+            if (nextTr) {
+                const nextTd = nextTr.children[colIndex];
+                const nextInput = nextTd.querySelector('input');
+                if (nextInput) nextInput.focus();
+            }
+        }
+
         function renderTable(students, mode, term) {
             const tbody = document.getElementById('table-body');
             const thead = document.getElementById('table-head');
             document.getElementById('results-area').classList.remove('hidden');
             document.getElementById('table-title').innerText = `Section ${students[0]?.section || ''} | ${term.toUpperCase()} (${mode})`;
             tbody.innerHTML = ''; thead.innerHTML = '';
+            
             if (mode === 'list') {
                 thead.innerHTML = `<tr><th>Student Name</th><th>User ID</th><th>Course</th><th>Status</th></tr>`;
                 students.forEach(s => {
                     tbody.innerHTML += `<tr><td class="fw-bold text-primary">${s.name}</td><td>${s.uid}</td><td>${s.course}</td><td><span class="badge ${s.status === 'Active' ? 'bg-success' : 'bg-danger'}">${s.status}</span></td></tr>`;
                 });
             } else if (mode === 'scores') {
-                thead.innerHTML = `<tr><th class="sticky-col">Student Name</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Proj</th><th>Exam</th><th class="bg-light">Att %</th><th class="bg-light">Grade</th></tr>`;
+                thead.innerHTML = `<tr><th class="sticky-col">Name</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Prj</th><th>Exm</th><th class="bg-light">Att%</th><th class="bg-light">Grd</th></tr>`;
                 students.forEach(s => {
                     if (s.status === "Dropped") return;
                     const sc = (s.scores && s.scores[term]) ? s.scores[term] : {};
@@ -542,27 +652,31 @@
                     tbody.innerHTML += `
                         <tr data-id="${s.docID}">
                             <td class="sticky-col">${s.name}</td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q1||''}" oninput="calcRow(this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q2||''}" oninput="calcRow(this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q3||''}" oninput="calcRow(this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q4||''}" oninput="calcRow(this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q5||''}" oninput="calcRow(this)"></td>
-                            <td><input type="number" class="table-input p-input" value="${sc.proj||''}" oninput="calcRow(this)"></td>
-                            <td><input type="number" class="table-input e-input" value="${sc.exam||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q1||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q2||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q3||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q4||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q5||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
+                            <td><input type="number" class="table-input p-input" value="${sc.proj||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
+                            <td><input type="number" class="table-input e-input" value="${sc.exam||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
                             <td class="text-center att-score">${att}%</td>
                             <td class="grade-cell ${g<75&&g!==''?'failing-grade':''}">${g}</td>
                         </tr>`;
                 });
             } else if (mode === 'attendance') {
-                let h = `<tr id="att-head"><th class="sticky-col">Student Name</th>`;
+                let h = `<tr id="att-head"><th class="sticky-col">Name</th>`;
                 existingDates.forEach(d => h += `<th><input type="text" class="date-header-input" value="${d}"></th>`);
-                h += `<th width="80" class="bg-light">Total %</th></tr>`;
+                h += `<th width="80" class="bg-light">Total</th></tr>`;
                 thead.innerHTML = h;
                 students.forEach(s => {
                     if (s.status === "Dropped") return;
                     const logs = (s.attendance_logs && s.attendance_logs[term]) ? s.attendance_logs[term] : {};
                     let r = `<tr data-id="${s.docID}"><td class="sticky-col">${s.name}</td>`;
-                    existingDates.forEach(d => r += `<td>${getAttDropdown(logs[d]||'Present')}</td>`);
+                    existingDates.forEach(d => {
+                        let val = "";
+                        if (d !== "") { val = logs[d] || ""; }
+                        r += `<td class="att-cell">${getAttDropdown(val)}</td>`;
+                    });
                     r += `<td class="text-center fw-bold att-total">${(s.attendance && s.attendance[term])?s.attendance[term]:0}%</td></tr>`;
                     tbody.innerHTML += r;
                 });
@@ -587,10 +701,13 @@
             if(final<75) cell.classList.add('failing-grade'); else cell.classList.remove('failing-grade');
         }
         function getAttDropdown(v) {
-            const c = v==='Present'?'att-present':v==='Absent'?'att-absent':v==='Late'?'att-late':'att-excused';
-            return `<select class="att-select ${c}" onchange="this.className='att-select '+ (this.value==='Present'?'att-present':this.value==='Absent'?'att-absent':this.value==='Late'?'att-late':'att-excused'); calcAtt(this)">
-                <option value="Present" ${v==='Present'?'selected':''}>P</option><option value="Late" ${v==='Late'?'selected':''}>L</option>
-                <option value="Excused" ${v==='Excused'?'selected':''}>E</option><option value="Absent" ${v==='Absent'?'selected':''}>A</option></select>`;
+            const c = v==='Present'?'att-present':v==='Absent'?'att-absent':v==='Late'?'att-late':v==='Excused'?'att-excused':'';
+            return `<select class="att-select ${c}" onchange="this.className='att-select '+ (this.value==='Present'?'att-present':this.value==='Absent'?'att-absent':this.value==='Late'?'att-late':this.value==='Excused'?'att-excused':''); calcAtt(this)">
+                <option value="" ${v===''?'selected':''}></option>
+                <option value="Present" ${v==='Present'?'selected':''}>P</option>
+                <option value="Late" ${v==='Late'?'selected':''}>L</option>
+                <option value="Excused" ${v==='Excused'?'selected':''}>E</option>
+                <option value="Absent" ${v==='Absent'?'selected':''}>A</option></select>`;
         }
         window.calcAtt = function(el) {
             const row = el.closest('tr');
@@ -598,36 +715,28 @@
             const headers = document.querySelectorAll('.date-header-input');
             let pts=0, max=0;
             sels.forEach((s,i) => {
-                if(headers[i] && headers[i].value.trim()!=="") { max++; if(s.value!=='Absent') pts++; }
+                if(headers[i] && headers[i].value.trim()!=="" && s.value !== "") { max++; if(s.value!=='Absent') pts++; }
             });
             row.querySelector('.att-total').innerText = (max>0?Math.round((pts/max)*100):0) + "%";
         }
         window.addDateColumn = function() {
-            const h = document.getElementById('att-head');
-            const th = document.createElement('th'); th.innerHTML = `<input type="text" class="date-header-input" value="New">`;
-            h.insertBefore(th, h.lastChild);
-            document.querySelectorAll('#table-body tr').forEach(r => {
-                const td = document.createElement('td'); td.innerHTML = getAttDropdown('Present');
-                r.insertBefore(td, r.lastChild);
-                calcAtt(td.querySelector('select'));
-            });
+            existingDates.push(""); 
+            renderTable(currentStudents, 'attendance', currentTerm); 
         }
         window.saveAttendance = async function() {
-            const b = document.querySelector('#attendance-buttons .btn-success'); b.innerText="Saving..."; b.disabled=true;
             const batch = window.writeBatch(window.db);
             const headers = document.querySelectorAll('.date-header-input');
             document.querySelectorAll('#table-body tr').forEach(r => {
                 const id = r.getAttribute('data-id');
                 const log = {};
-                r.querySelectorAll('select').forEach((s,i) => { if(headers[i].value.trim()) log[headers[i].value.trim()] = s.value; });
+                r.querySelectorAll('select').forEach((s,i) => { if(headers[i].value.trim() && s.value) { log[headers[i].value.trim()] = s.value; } });
                 const tot = parseInt(r.querySelector('.att-total').innerText)||0;
                 const up = {}; up[`attendance_logs.${currentTerm}`]=log; up[`attendance.${currentTerm}`]=tot;
                 batch.update(window.doc(window.db,"students",id), up);
             });
-            await batch.commit(); alert("Saved!"); b.innerText="💾 Save Attendance Log"; b.disabled=false;
+            await batch.commit(); showToast("Attendance Saved");
         }
         window.saveScores = async function() {
-            const b = document.querySelector('#scores-buttons .btn-success'); b.innerText="Saving..."; b.disabled=true;
             const batch = window.writeBatch(window.db);
             document.querySelectorAll('#table-body tr').forEach(r => {
                 const id = r.getAttribute('data-id');
@@ -639,11 +748,19 @@
                 up[`scores.${currentTerm}.exam`]=r.querySelector('.e-input').value; up[`grades.${currentTerm}`]=r.querySelector('.grade-cell').innerText;
                 batch.update(window.doc(window.db,"students",id), up);
             });
-            await batch.commit(); alert("Saved!"); b.innerText="💾 Save All Scores"; b.disabled=false;
+            await batch.commit(); showToast("Scores Saved");
         }
         window.processCSV = async function() {
-            const f = document.getElementById('csv-file'); if(!f.files.length) return alert("File?");
+            const f = document.getElementById('csv-file'); if(!f.files.length) return showToast("Select File", "error");
             const r = new FileReader();
+            
+            // Progress Bar Init
+            const pBar = document.getElementById('import-progress-bar');
+            const pContainer = document.getElementById('import-progress-container');
+            const pText = document.getElementById('progress-percent');
+            pContainer.classList.remove('hidden');
+            pBar.style.width = '0%'; pText.innerText = '0%';
+
             r.onload = async function(e) {
                 const lines = e.target.result.split(/\r?\n/);
                 let c=0;
@@ -658,44 +775,43 @@
                             uid:uid, password:cl(row[1]), name:cl(row[2]), subject:cl(row[3]), section:sec, course:cl(row[5]), status:cl(row[6])||'Active'
                         }, {merge:true});
                         c++;
+                        // Update Progress
+                        const percent = Math.round((i / lines.length) * 100);
+                        pBar.style.width = percent + '%';
+                        pText.innerText = percent + '%';
                     } catch(err){console.error(err);}
                 }
-                alert("Uploaded "+c); location.reload();
+                showToast(`Uploaded ${c} records`);
+                document.getElementById('import-modal').classList.add('hidden');
+                pContainer.classList.add('hidden'); // Hide progress
+                await fetchSectionsForDropdown();
             };
             r.readAsText(f.files[0]);
         }
-
-        // --- STUDENT FUNCTIONS (MULTI-SUBJECT) ---
+        
+        // --- STUDENT FUNCTIONS ---
         function initStudentPortal() {
             if (allStudentSubjects.length === 0) return;
-
-            // 1. Populate Subject Dropdown
             const select = document.getElementById('student-subject-select');
-            select.innerHTML = ''; // clear
-
+            select.innerHTML = '';
             allStudentSubjects.forEach((sub, index) => {
                 const opt = document.createElement('option');
                 opt.value = index;
                 opt.text = `${sub.subject} (${sub.section})`;
                 select.appendChild(opt);
             });
-
-            // 2. Render the first subject by default
             renderStudentPage(allStudentSubjects[0]);
         }
-
         window.switchStudentSubject = function() {
             const index = document.getElementById('student-subject-select').value;
             renderStudentPage(allStudentSubjects[index]);
         }
-
         function renderStudentPage(data) {
-            activeStudentSubject = data; // store active for settings refresh
-
+            activeStudentSubject = data;
             document.getElementById('student-name-display').innerText = `${data.name} | ${data.course}`;
-            document.getElementById('lbl-prelim-w').innerText = `${globalWeights.prelim}% Weight`;
-            document.getElementById('lbl-mid-w').innerText = `${globalWeights.midterm}% Weight`;
-            document.getElementById('lbl-fin-w').innerText = `${globalWeights.finals}% Weight`;
+            document.getElementById('lbl-prelim-w').innerText = `${globalWeights.prelim}%`;
+            document.getElementById('lbl-mid-w').innerText = `${globalWeights.midterm}%`;
+            document.getElementById('lbl-fin-w').innerText = `${globalWeights.finals}%`;
 
             const g = data.grades || {};
             const p = parseFloat(g.prelim) || null;
@@ -709,46 +825,44 @@
             const wP = globalWeights.prelim/100;
             const wM = globalWeights.midterm/100;
             const wF = globalWeights.finals/100;
-
+            let cardGrade = null;
             if (p && m && f) {
-                const card = Math.round((p * wP) + (m * wM) + (f * wF));
-                document.getElementById('s-card').innerText = card;
+                cardGrade = Math.round((p * wP) + (m * wM) + (f * wF));
+                document.getElementById('s-card').innerText = cardGrade;
             } else { document.getElementById('s-card').innerText = "--"; }
             
-            // Re-render the detailed breakdown
             showStudentTerm('prelim', document.querySelector('.nav-link.active'));
-            // Reset calculator
             document.getElementById('target-grade-input').value = "";
+            document.getElementById('f-prelim-box').classList.add('hidden');
             document.getElementById('f-midterm-box').classList.add('hidden');
             document.getElementById('f-finals-box').classList.add('hidden');
+            
+            // Initial call to hide or reset progress bars
+            updateProgressBars(null); 
         }
-
         window.showStudentTerm = function(term, btn) {
             if (!activeStudentSubject) return;
-            
             document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
             const container = document.getElementById('student-term-detail');
             const data = activeStudentSubject;
-
             const scores = (data.scores && data.scores[term]) ? data.scores[term] : {};
             const att = (data.attendance && data.attendance[term]) ? data.attendance[term] : 0;
             const logs = (data.attendance_logs && data.attendance_logs[term]) ? data.attendance_logs[term] : {};
-
+            
             container.innerHTML = `
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="card p-3 h-100 bg-white border-0 shadow-sm">
                             <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Scores</h6>
-                            <table class="table table-sm table-borderless">
+                            <table class="table table-sm table-borderless small">
                                 <tbody>
-                                    <tr><td class="text-muted">Quiz 1</td><td class="fw-bold">${scores.q1 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 2</td><td class="fw-bold">${scores.q2 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 3</td><td class="fw-bold">${scores.q3 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 4</td><td class="fw-bold">${scores.q4 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 5</td><td class="fw-bold">${scores.q5 || '-'}</td></tr>
-                                    <tr class="border-top"><td class="text-dark"><strong>Quiz Average</strong></td><td class="text-primary"><strong>${calcQuizAvg(scores)}</strong></td></tr>
+                                    <tr><td class="text-muted">Quiz 1</td><td class="fw-bold text-end">${scores.q1 || '-'}</td></tr>
+                                    <tr><td class="text-muted">Quiz 2</td><td class="fw-bold text-end">${scores.q2 || '-'}</td></tr>
+                                    <tr><td class="text-muted">Quiz 3</td><td class="fw-bold text-end">${scores.q3 || '-'}</td></tr>
+                                    <tr><td class="text-muted">Quiz 4</td><td class="fw-bold text-end">${scores.q4 || '-'}</td></tr>
+                                    <tr><td class="text-muted">Quiz 5</td><td class="fw-bold text-end">${scores.q5 || '-'}</td></tr>
+                                    <tr class="border-top"><td class="text-dark"><strong>Quiz Avg</strong></td><td class="text-primary text-end"><strong>${calcQuizAvg(scores)}</strong></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -756,12 +870,12 @@
                     <div class="col-md-6">
                         <div class="card p-3 h-100 bg-white border-0 shadow-sm">
                             <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Components</h6>
-                            <table class="table table-sm table-borderless">
+                            <table class="table table-sm table-borderless small">
                                 <tbody>
-                                    <tr><td class="text-muted">Project</td><td class="fw-bold">${scores.proj || '-'}</td></tr>
-                                    <tr><td class="text-muted">Term Exam</td><td class="fw-bold">${scores.exam || '-'}</td></tr>
-                                    <tr><td class="text-muted">Attendance</td><td class="fw-bold">${att}% <a href="#" class="small text-decoration-none" onclick="showAttModal('${term}')">(Log)</a></td></tr>
-                                    <tr class="table-primary rounded"><td class="p-2 text-primary"><strong>${term.toUpperCase()} GRADE</strong></td><td class="p-2 text-primary"><strong>${(data.grades && data.grades[term]) || '-'}</strong></td></tr>
+                                    <tr><td class="text-muted">Project</td><td class="fw-bold text-end">${scores.proj || '-'}</td></tr>
+                                    <tr><td class="text-muted">Exam</td><td class="fw-bold text-end">${scores.exam || '-'}</td></tr>
+                                    <tr><td class="text-muted">Attendance</td><td class="fw-bold text-end d-flex align-items-center justify-content-end gap-2">${att} <button class="btn btn-outline-primary icon-btn" style="width:24px; height:24px; font-size:12px;" onclick="showAttModal('${term}')"><i class="bi bi-list-task"></i></button></td></tr>
+                                    <tr class="table-primary rounded"><td class="p-2 text-primary"><strong>${term.toUpperCase()}</strong></td><td class="p-2 text-primary text-end"><strong>${(data.grades && data.grades[term]) || '-'}</strong></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -779,9 +893,9 @@
             const body = document.getElementById('att-modal-body');
             const logs = window.currentLogs || {};
             if (Object.keys(logs).length === 0) {
-                body.innerHTML = "<div class='p-4 text-center text-muted'>No attendance records found.</div>";
+                body.innerHTML = "<div class='p-3 text-center text-muted small'>No records found.</div>";
             } else {
-                let html = "<table class='table table-hover mb-0'><thead class='table-light'><tr><th class='ps-4'>Date</th><th>Status</th></tr></thead><tbody>";
+                let html = "<table class='table table-hover mb-0 small'><thead class='table-light'><tr><th class='ps-4'>Date</th><th>Status</th></tr></thead><tbody>";
                 Object.keys(logs).sort().forEach(d => {
                     const st = logs[d];
                     const color = st==='Present'?'text-success':st==='Absent'?'text-danger':st==='Late'?'text-warning':'text-primary';
@@ -792,32 +906,132 @@
             }
             new bootstrap.Modal(document.getElementById('attModal')).show();
         }
+        
+        // --- TARGET CALCULATION LOGIC UPDATED ---
         window.calculateForecast = function() {
             const target = parseFloat(document.getElementById('target-grade-input').value);
-            const p = parseFloat(document.getElementById('s-prelim').innerText);
-            const m = parseFloat(document.getElementById('s-midterm').innerText);
+            
+            // Helper: Returns numeric value or null if missing (treated as not yet entered)
+            const getVal = (id) => {
+                const txt = document.getElementById(id).innerText;
+                return (txt === "--" || isNaN(parseFloat(txt))) ? null : parseFloat(txt);
+            };
+
+            const p = getVal('s-prelim');
+            const m = getVal('s-midterm');
+            const f = getVal('s-finals'); // Usually missing if we are forecasting
+            
+            const prelimBox = document.getElementById('f-prelim-box');
             const midBox = document.getElementById('f-midterm-box');
             const finBox = document.getElementById('f-finals-box');
+            
+            const prelimVal = document.getElementById('f-prelim');
             const midVal = document.getElementById('f-midterm');
             const finVal = document.getElementById('f-finals');
-            midBox.classList.add('hidden'); finBox.classList.add('hidden');
-            if (!target || isNaN(p)) return;
+
+            // Reset UI
+            prelimBox.classList.add('hidden'); midBox.classList.add('hidden'); finBox.classList.add('hidden');
+            
+            // Pass target to progress bars even if target is 0/empty to reset them
+            updateProgressBars(target);
+
+            if (!target) return; 
+
             const wP = globalWeights.prelim/100;
             const wM = globalWeights.midterm/100;
             const wF = globalWeights.finals/100;
-            if (isNaN(m)) {
-                const remainingWeight = wM + wF;
-                const needed = (target - (p * wP)) / remainingWeight;
+            
+            // --- SCENARIO 1: NO GRADES YET (Start of Semester) ---
+            if (p === null && m === null) {
+                // Target = Needed * (wP + wM + wF)  => Needed = Target / 1
+                const needed = target; 
                 const rounded = Math.ceil(needed);
-                midBox.classList.remove('hidden'); finBox.classList.remove('hidden');
-                midVal.innerText = rounded > 100 ? "Impossible" : rounded;
-                finVal.innerText = rounded > 100 ? "Impossible" : rounded;
-            } else {
-                const needed = (target - (p * wP) - (m * wM)) / wF;
-                const rounded = Math.ceil(needed);
-                finBox.classList.remove('hidden');
-                finVal.innerText = rounded > 100 ? "Impossible" : rounded;
+                
+                // Show needed for ALL terms
+                prelimBox.classList.remove('hidden'); midBox.classList.remove('hidden'); finBox.classList.remove('hidden');
+                
+                prelimVal.innerText = formatNeeded(rounded);
+                midVal.innerText = formatNeeded(rounded);
+                finVal.innerText = formatNeeded(rounded);
+                return;
             }
+
+            // --- SCENARIO 2: PRELIM EXISTS, MIDTERM MISSING ---
+            if (p !== null && m === null) {
+                // Target = (P * wP) + (Needed * (wM + wF))
+                const currentPoints = p * wP;
+                const remainingWeight = wM + wF;
+                const needed = (target - currentPoints) / remainingWeight;
+                const rounded = Math.ceil(needed);
+                
+                midBox.classList.remove('hidden'); finBox.classList.remove('hidden');
+                midVal.innerText = formatNeeded(rounded);
+                finVal.innerText = formatNeeded(rounded);
+                return;
+            }
+
+            // --- SCENARIO 3: PRELIM & MIDTERM EXIST, FINALS MISSING ---
+            if (p !== null && m !== null) {
+                // Target = (P * wP) + (M * wM) + (Needed * wF)
+                const currentPoints = (p * wP) + (m * wM);
+                const needed = (target - currentPoints) / wF;
+                const rounded = Math.ceil(needed);
+                
+                finBox.classList.remove('hidden');
+                finVal.innerText = formatNeeded(rounded);
+                return;
+            }
+        }
+
+        function formatNeeded(val) {
+            if (val > 100) return "Impossible";
+            if (val < 0) return 0;
+            return val;
+        }
+
+        function updateProgressBars(target) {
+            const ids = ['prelim', 'midterm', 'finals', 'card'];
+            
+            ids.forEach(term => {
+                const box = document.getElementById(`p-${term}-bar-box`);
+                const bar = document.getElementById(`p-${term}-bar`);
+                const valTxt = document.getElementById(`s-${term}`).innerText;
+                
+                // Only show progress if target is set AND we have a grade (for Card Grade progress is useful)
+                // OR if we want to show progress towards target even if grade is 0 (shows empty bar).
+                // Let's show it if target exists.
+                
+                if (!target || valTxt === "--") {
+                    box.classList.add('hidden');
+                    return;
+                }
+
+                box.classList.remove('hidden');
+                const current = parseFloat(valTxt) || 0;
+                
+                // Calculate percentage of target achieved. 
+                // e.g. Target 90, Current 45 -> 50%
+                // BUT logically, for a term grade, if I have 85 and target is 90, I am "close".
+                // Let's make the bar represent the grade value itself relative to 100, 
+                // but colored based on proximity to target.
+                
+                // Actually user asked: "how near the student is in achieving the calculated should-be term grade"
+                // This implies comparing Current Grade vs Target Grade.
+                
+                let percent = (current / target) * 100;
+                if (percent > 100) percent = 100;
+                
+                bar.style.width = percent + "%";
+                
+                // Color Logic
+                if (current >= target) {
+                    bar.style.backgroundColor = "var(--success-green)"; // On track
+                } else if (current >= target - 5) {
+                    bar.style.backgroundColor = "var(--warning-orange)"; // Close
+                } else {
+                    bar.style.backgroundColor = "var(--danger-red)"; // Far behind
+                }
+            });
         }
     </script>
 </body>
