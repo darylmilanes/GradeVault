@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradeVault Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-white: #fafeff;
+            --primary-blue: #004080;
+            --text-black: #474747;
+            --light-gray: #e9ecef;
+            --success-green: #28a745;
+            --danger-red: #dc3545;
+            --warning-orange: #fd7e14;
+        }
+
+        body { background-color: var(--bg-white); color: var(--text-black); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        /* Navbar */
+        .navbar { background-color: var(--primary-blue) !important; }
+        .navbar-brand { color: var(--bg-white) !important; font-weight: bold; }
+        .btn-outline-light { border-color: var(--bg-white); color: var(--bg-white); }
+        .btn-outline-light:hover { background-color: var(--bg-white); color: var(--primary-blue); }
+
+        /* Login & Cards */
+        .login-container { max-width: 400px; margin: 100px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid var(--primary-blue); }
+        .card { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); background-color: white; border-radius: 8px; }
+        .hidden { display: none; }
+
+        /* Teacher Table Styling */
+        .table-input { width: 60px; text-align: center; border: 1px solid #ced4da; border-radius: 4px; padding: 2px; }
+        .table-input:focus { border-color: var(--primary-blue); outline: none; }
+        .sticky-col { position: sticky; left: 0; background-color: white; z-index: 10; border-right: 2px solid #dee2e6; width: 250px; }
+        
+        /* Attendance Styling */
+        .date-header-input { border: none; background: transparent; font-weight: bold; width: 80px; text-align: center; }
+        .att-select { width: 100%; border: 1px solid transparent; text-align: center; cursor: pointer; }
+        .att-present { color: var(--success-green); font-weight: bold; }
+        .att-absent { color: var(--danger-red); font-weight: bold; }
+        .att-late { color: var(--warning-orange); font-weight: bold; }
+        .att-excused { color: var(--primary-blue); font-weight: bold; }
+
+        /* Student Portal Specific */
+        .grade-card { background: white; border-radius: 10px; padding: 20px; text-align: center; border-top: 4px solid var(--primary-blue); height: 100%; }
+        .grade-value { font-size: 2.5rem; font-weight: bold; color: var(--primary-blue); }
+        .grade-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; }
+        .forecast-box { background-color: #f8f9fa; border: 1px dashed #adb5bd; padding: 10px; margin-top: 10px; border-radius: 5px; }
+        .forecast-val { font-weight: bold; color: var(--warning-orange); font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div id="login-section" class="container">
+        <div class="login-container">
+            <h3 class="text-center mb-4">GradeVault Login</h3>
+            <div class="mb-3">
+                <label>User ID / Email</label>
+                <input type="text" id="login-uid" class="form-control" placeholder="Student ID or Admin Email">
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" id="login-pass" class="form-control" placeholder="Enter Password">
+            </div>
+            <button onclick="handleLogin()" class="btn btn-primary w-100">Login</button>
+            <p id="login-error" class="text-danger mt-2 text-center"></p>
+        </div>
+    </div>
+
+    <div id="teacher-section" class="hidden">
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <span class="navbar-brand">GradeVault: Teacher</span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm">Logout</button>
+            </div>
+        </nav>
+        <div class="container-fluid px-4">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-primary">Class Management</h5>
+                            <button onclick="openSettingsModal()" class="btn btn-sm btn-outline-primary">⚙️ Grade Settings</button>
+                        </div>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label">Term</label>
+                                <select id="term-select" class="form-select">
+                                    <option value="prelim">Prelim</option>
+                                    <option value="midterm">Midterm</option>
+                                    <option value="finals">Finals</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Section</label>
+                                <select id="section-select" class="form-select"><option value="">Loading...</option></select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">View Mode</label>
+                                <select id="view-mode" class="form-select" onchange="toggleTeacherButtons()">
+                                    <option value="list">Student List</option>
+                                    <option value="scores">Scores</option>
+                                    <option value="attendance">Attendance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button onclick="loadClassList()" class="btn btn-primary w-100">Load List</button>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <div id="scores-buttons" class="hidden">
+                                    <button onclick="saveScores()" class="btn btn-success">💾 Save Scores</button>
+                                </div>
+                                <div id="attendance-buttons" class="hidden">
+                                    <button onclick="addDateColumn()" class="btn btn-outline-primary">+ Add Date</button>
+                                    <button onclick="saveAttendance()" class="btn btn-success">💾 Save Attendance</button>
+                                </div>
+                                <button onclick="document.getElementById('import-modal').classList.remove('hidden')" class="btn btn-outline-secondary mt-1">Import CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results-area" class="hidden">
+                <div class="card p-3">
+                    <h5 id="table-title">Class List</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle" id="data-table">
+                            <thead id="table-head" class="table-light"></thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="student-section" class="hidden">
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <span class="navbar-brand">GradeVault: Student Portal</span>
+                <span class="navbar-text text-white me-3" id="student-name-display"></span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm">Logout</button>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card p-3 d-flex flex-row align-items-center justify-content-between bg-light">
+                        <div class="d-flex align-items-center">
+                            <h5 class="mb-0 me-3 text-primary">🎯 Target Card Grade:</h5>
+                            <input type="number" id="target-grade-input" class="form-control" style="width: 100px; font-weight: bold; font-size: 1.2rem;" placeholder="90" oninput="calculateForecast()">
+                        </div>
+                        <div class="text-muted small">Set your goal to see what you need to achieve in upcoming terms.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4 text-center">
+                <div class="col-md-3">
+                    <div class="grade-card">
+                        <div class="grade-label">Prelim Grade</div>
+                        <div class="grade-value" id="s-prelim">--</div>
+                        <div class="small text-muted" id="lbl-prelim-w">--% Weight</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="grade-card">
+                        <div class="grade-label">Midterm Grade</div>
+                        <div class="grade-value" id="s-midterm">--</div>
+                        <div class="small text-muted" id="lbl-mid-w">--% Weight</div>
+                        <div class="forecast-box hidden" id="f-midterm-box">
+                            <small>Need:</small> <div class="forecast-val" id="f-midterm">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="grade-card">
+                        <div class="grade-label">Finals Grade</div>
+                        <div class="grade-value" id="s-finals">--</div>
+                        <div class="small text-muted" id="lbl-fin-w">--% Weight</div>
+                        <div class="forecast-box hidden" id="f-finals-box">
+                            <small>Need:</small> <div class="forecast-val" id="f-finals">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="grade-card" style="background-color: #e3f2fd; border-color: #004080;">
+                        <div class="grade-label text-dark">CARD GRADE</div>
+                        <div class="grade-value" id="s-card">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card p-4">
+                        <h5 class="mb-3">Grade Details & Components</h5>
+                        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+                            <li class="nav-item"><button class="nav-link active" onclick="showStudentTerm('prelim', this)">Prelim</button></li>
+                            <li class="nav-item"><button class="nav-link" onclick="showStudentTerm('midterm', this)">Midterm</button></li>
+                            <li class="nav-item"><button class="nav-link" onclick="showStudentTerm('finals', this)">Finals</button></li>
+                        </ul>
+                        <div id="student-term-detail"><p class="text-muted">Loading...</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">⚙️ Grade Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted">Adjust how grades are computed. Totals must equal 100%.</p>
+                    
+                    <h6 class="text-primary mt-3">Component Weights (%)</h6>
+                    <div class="row g-2">
+                        <div class="col-6"><label>Quizzes</label><input type="number" id="w-quiz" class="form-control"></div>
+                        <div class="col-6"><label>Projects</label><input type="number" id="w-proj" class="form-control"></div>
+                        <div class="col-6"><label>Exams</label><input type="number" id="w-exam" class="form-control"></div>
+                        <div class="col-6"><label>Attendance</label><input type="number" id="w-att" class="form-control"></div>
+                    </div>
+
+                    <h6 class="text-primary mt-3">Term Grade Weights (%)</h6>
+                    <div class="row g-2">
+                        <div class="col-4"><label>Prelim</label><input type="number" id="w-prelim" class="form-control"></div>
+                        <div class="col-4"><label>Midterm</label><input type="number" id="w-mid" class="form-control"></div>
+                        <div class="col-4"><label>Finals</label><input type="number" id="w-fin" class="form-control"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="import-modal" class="card p-4 hidden" style="position:fixed; top:20%; left:30%; width:40%; z-index:1000; border: 2px solid var(--primary-blue);">
+        <h5>Import Student Data</h5>
+        <input type="file" id="csv-file" accept=".csv" class="form-control mb-2">
+        <button onclick="processCSV()" class="btn btn-success">Upload</button>
+        <button onclick="document.getElementById('import-modal').classList.add('hidden')" class="btn btn-secondary mt-2">Close</button>
+        <div id="upload-status" class="mt-2"></div>
+    </div>
+
+    <div class="modal fade" id="attModal" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Attendance Log</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="att-modal-body"></div>
+        </div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+          apiKey: "AIzaSyALyoSZFrB9odSuydyDvRkVGCDdDQa0Ub8",
+          authDomain: "gradevault-app.firebaseapp.com",
+          projectId: "gradevault-app",
+          storageBucket: "gradevault-app.firebasestorage.app",
+          messagingSenderId: "538075460552",
+          appId: "1:538075460552:web:1175068265c9ffe78d86fd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // Expose to window for the main script
+        window.db = db;
+        window.auth = auth;
+        window.collection = collection;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.where = where;
+        window.writeBatch = writeBatch;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+    </script>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let currentStudents = []; 
+        let currentTerm = "";
+        let existingDates = [];
+        let studentData = null; 
+        
+        // ======================================================
+        // IMPORTANT: PASTE YOUR ADMIN UID HERE FROM FIREBASE!
+        // ======================================================
+        const ADMIN_UID = "Xv71xkRee8grRRhpfO2WYKoQhEC2"; 
+        // ======================================================
+
+        // DEFAULT WEIGHTS (Will be overwritten by DB)
+        let globalWeights = {
+            quiz: 20, project: 30, exam: 40, attendance: 10,
+            prelim: 25, midterm: 35, finals: 40
+        };
+
+        // --- 1. LOGIN LOGIC (SECURE) ---
+        async function handleLogin() {
+            const uidInput = document.getElementById('login-uid').value.trim();
+            const passInput = document.getElementById('login-pass').value.trim();
+            const errorMsg = document.getElementById('login-error');
+            errorMsg.innerText = "Verifying...";
+
+            if (!uidInput || !passInput) { errorMsg.innerText = "Please enter credentials."; return; }
+
+            // Fetch Settings First
+            await fetchSettings();
+
+            try {
+                // CASE A: ADMIN LOGIN (Email Detected)
+                if (uidInput.includes("@")) {
+                    const userCredential = await window.signInWithEmailAndPassword(window.auth, uidInput, passInput);
+                    const user = userCredential.user;
+
+                    if (user.uid === ADMIN_UID) {
+                        document.getElementById('login-section').classList.add('hidden');
+                        document.getElementById('teacher-section').classList.remove('hidden');
+                        await fetchSectionsForDropdown();
+                    } else {
+                        errorMsg.innerText = "Access Denied: You are not the authorized Admin.";
+                        window.signOut(window.auth);
+                    }
+                } 
+                // CASE B: STUDENT LOGIN (ID Detected)
+                else {
+                    const q = window.query(window.collection(window.db, "students"), 
+                                           window.where("uid", "==", uidInput),
+                                           window.where("password", "==", passInput));
+                    const snapshot = await window.getDocs(q);
+
+                    if (!snapshot.empty) {
+                        studentData = snapshot.docs[0].data();
+                        document.getElementById('login-section').classList.add('hidden');
+                        document.getElementById('student-section').classList.remove('hidden');
+                        initStudentPortal();
+                    } else {
+                        errorMsg.innerText = "Invalid User ID or Password.";
+                    }
+                }
+            } catch (error) {
+                console.error("Login Error:", error);
+                errorMsg.innerText = "Login Failed: " + error.message;
+            }
+        }
+
+        function logout() { 
+            window.signOut(window.auth).then(() => location.reload()).catch(() => location.reload());
+        }
+
+        // --- 2. SETTINGS LOGIC ---
+        async function fetchSettings() {
+            try {
+                const docSnap = await window.getDoc(window.doc(window.db, "settings", "config"));
+                if (docSnap.exists()) globalWeights = docSnap.data();
+            } catch (e) { console.error("Error loading settings:", e); }
+        }
+
+        window.openSettingsModal = function() {
+            document.getElementById('w-quiz').value = globalWeights.quiz;
+            document.getElementById('w-proj').value = globalWeights.project;
+            document.getElementById('w-exam').value = globalWeights.exam;
+            document.getElementById('w-att').value = globalWeights.attendance;
+            document.getElementById('w-prelim').value = globalWeights.prelim;
+            document.getElementById('w-mid').value = globalWeights.midterm;
+            document.getElementById('w-fin').value = globalWeights.finals;
+            new bootstrap.Modal(document.getElementById('settingsModal')).show();
+        }
+
+        window.saveSettings = async function() {
+            const newWeights = {
+                quiz: parseFloat(document.getElementById('w-quiz').value),
+                project: parseFloat(document.getElementById('w-proj').value),
+                exam: parseFloat(document.getElementById('w-exam').value),
+                attendance: parseFloat(document.getElementById('w-att').value),
+                prelim: parseFloat(document.getElementById('w-prelim').value),
+                midterm: parseFloat(document.getElementById('w-mid').value),
+                finals: parseFloat(document.getElementById('w-fin').value)
+            };
+
+            const compTotal = newWeights.quiz + newWeights.project + newWeights.exam + newWeights.attendance;
+            const termTotal = newWeights.prelim + newWeights.midterm + newWeights.finals;
+
+            if (compTotal !== 100) { alert(`Components total ${compTotal}%, must be 100%.`); return; }
+            if (termTotal !== 100) { alert(`Term grades total ${termTotal}%, must be 100%.`); return; }
+
+            try {
+                await window.setDoc(window.doc(window.db, "settings", "config"), newWeights);
+                globalWeights = newWeights;
+                alert("Settings Saved!");
+                bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+                initStudentPortal(); // Refresh views if needed
+            } catch (e) { alert("Error: " + e.message); }
+        }
+
+        // --- 3. TEACHER FUNCTIONS ---
+        function toggleTeacherButtons() {
+            const mode = document.getElementById('view-mode').value;
+            document.getElementById('scores-buttons').classList.add('hidden');
+            document.getElementById('attendance-buttons').classList.add('hidden');
+            if (mode === 'scores') document.getElementById('scores-buttons').classList.remove('hidden');
+            if (mode === 'attendance') document.getElementById('attendance-buttons').classList.remove('hidden');
+        }
+
+        async function fetchSectionsForDropdown() {
+            const select = document.getElementById('section-select');
+            try {
+                const q = window.query(window.collection(window.db, "students"));
+                const querySnapshot = await window.getDocs(q);
+                const sections = new Set();
+                querySnapshot.forEach(doc => { if(doc.data().section) sections.add(doc.data().section); });
+                select.innerHTML = '<option value="">Select Section</option>';
+                Array.from(sections).sort().forEach(sec => {
+                    const opt = document.createElement('option');
+                    opt.value = sec; opt.textContent = sec; select.appendChild(opt);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadClassList() {
+            const section = document.getElementById('section-select').value;
+            currentTerm = document.getElementById('term-select').value;
+            const mode = document.getElementById('view-mode').value;
+            if (!section) { alert("Please select a section."); return; }
+            toggleTeacherButtons();
+
+            const q = window.query(window.collection(window.db, "students"), window.where("section", "==", section));
+            const snapshot = await window.getDocs(q);
+            currentStudents = [];
+            snapshot.forEach(doc => { let d = doc.data(); d.docID = doc.id; currentStudents.push(d); });
+            currentStudents.sort((a, b) => a.name.localeCompare(b.name));
+
+            if (mode === 'attendance') {
+                const dateSet = new Set();
+                currentStudents.forEach(s => {
+                    if (s.attendance_logs && s.attendance_logs[currentTerm]) 
+                        Object.keys(s.attendance_logs[currentTerm]).forEach(d => dateSet.add(d));
+                });
+                existingDates = Array.from(dateSet).sort();
+            }
+            renderTable(currentStudents, mode, currentTerm);
+        }
+
+        function renderTable(students, mode, term) {
+            const tbody = document.getElementById('table-body');
+            const thead = document.getElementById('table-head');
+            document.getElementById('results-area').classList.remove('hidden');
+            document.getElementById('table-title').innerText = `Section ${students[0]?.section || ''} - ${term.toUpperCase()} (${mode})`;
+            tbody.innerHTML = ''; thead.innerHTML = '';
+
+            if (mode === 'list') {
+                thead.innerHTML = `<tr><th>Student Name</th><th>User ID</th><th>Course</th><th>Status</th></tr>`;
+                students.forEach(s => {
+                    tbody.innerHTML += `<tr><td>${s.name}</td><td>${s.uid}</td><td>${s.course}</td><td><span class="badge ${s.status === 'Active' ? 'bg-success' : 'bg-danger'}">${s.status}</span></td></tr>`;
+                });
+            } else if (mode === 'scores') {
+                thead.innerHTML = `<tr><th class="sticky-col">Student Name</th><th width="70">Q1</th><th width="70">Q2</th><th width="70">Q3</th><th width="70">Q4</th><th width="70">Q5</th><th width="70">Proj</th><th width="70">Exam</th><th width="70" class="bg-light">Att %</th><th width="80" class="bg-light">Grade</th></tr>`;
+                students.forEach(s => {
+                    if (s.status === "Dropped") return;
+                    const sc = (s.scores && s.scores[term]) ? s.scores[term] : {};
+                    const g = (s.grades && s.grades[term]) ? s.grades[term] : "";
+                    const att = (s.attendance && s.attendance[term]) ? s.attendance[term] : 0;
+                    tbody.innerHTML += `
+                        <tr data-id="${s.docID}">
+                            <td class="sticky-col">${s.name}</td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q1||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q2||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q3||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q4||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input q-input" value="${sc.q5||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input p-input" value="${sc.proj||''}" oninput="calcRow(this)"></td>
+                            <td><input type="number" class="table-input e-input" value="${sc.exam||''}" oninput="calcRow(this)"></td>
+                            <td class="text-center att-score">${att}%</td>
+                            <td class="grade-cell ${g<75&&g!==''?'failing-grade':''}">${g}</td>
+                        </tr>`;
+                });
+            } else if (mode === 'attendance') {
+                let h = `<tr id="att-head"><th class="sticky-col">Student Name</th>`;
+                existingDates.forEach(d => h += `<th><input type="text" class="date-header-input" value="${d}"></th>`);
+                h += `<th width="80" class="bg-light">Total %</th></tr>`;
+                thead.innerHTML = h;
+                students.forEach(s => {
+                    if (s.status === "Dropped") return;
+                    const logs = (s.attendance_logs && s.attendance_logs[term]) ? s.attendance_logs[term] : {};
+                    let r = `<tr data-id="${s.docID}"><td class="sticky-col">${s.name}</td>`;
+                    existingDates.forEach(d => r += `<td>${getAttDropdown(logs[d]||'Present')}</td>`);
+                    r += `<td class="text-center fw-bold att-total">${(s.attendance && s.attendance[term])?s.attendance[term]:0}%</td></tr>`;
+                    tbody.innerHTML += r;
+                });
+            }
+        }
+
+        window.calcRow = function(el) {
+            const row = el.closest('tr');
+            const qs = Array.from(row.querySelectorAll('.q-input')).map(i => i.value);
+            const p = parseFloat(row.querySelector('.p-input').value)||0;
+            const e = parseFloat(row.querySelector('.e-input').value)||0;
+            const a = parseFloat(row.querySelector('.att-score').innerText)||0;
+            let sum=0, cnt=0;
+            qs.forEach(v => {if(v!==""){sum+=parseFloat(v); cnt++;}});
+            if(cnt===0 && p===0 && e===0) return; 
+
+            const wQ = globalWeights.quiz / 100;
+            const wP = globalWeights.project / 100;
+            const wE = globalWeights.exam / 100;
+            const wA = globalWeights.attendance / 100;
+
+            const final = Math.round(((cnt>0?sum/cnt:0)*wQ) + (p*wP) + (e*wE) + (a*wA));
+            const cell = row.querySelector('.grade-cell');
+            cell.innerText = final;
+            if(final<75) cell.classList.add('failing-grade'); else cell.classList.remove('failing-grade');
+        }
+
+        function getAttDropdown(v) {
+            const c = v==='Present'?'att-present':v==='Absent'?'att-absent':v==='Late'?'att-late':'att-excused';
+            return `<select class="att-select ${c}" onchange="this.className='att-select '+ (this.value==='Present'?'att-present':this.value==='Absent'?'att-absent':this.value==='Late'?'att-late':'att-excused'); calcAtt(this)">
+                <option value="Present" ${v==='Present'?'selected':''}>P</option><option value="Late" ${v==='Late'?'selected':''}>L</option>
+                <option value="Excused" ${v==='Excused'?'selected':''}>E</option><option value="Absent" ${v==='Absent'?'selected':''}>A</option></select>`;
+        }
+        window.calcAtt = function(el) {
+            const row = el.closest('tr');
+            const sels = row.querySelectorAll('select');
+            const headers = document.querySelectorAll('.date-header-input');
+            let pts=0, max=0;
+            sels.forEach((s,i) => {
+                if(headers[i] && headers[i].value.trim()!=="") { max++; if(s.value!=='Absent') pts++; }
+            });
+            row.querySelector('.att-total').innerText = (max>0?Math.round((pts/max)*100):0) + "%";
+        }
+        window.addDateColumn = function() {
+            const h = document.getElementById('att-head');
+            const th = document.createElement('th'); th.innerHTML = `<input type="text" class="date-header-input" value="New">`;
+            h.insertBefore(th, h.lastChild);
+            document.querySelectorAll('#table-body tr').forEach(r => {
+                const td = document.createElement('td'); td.innerHTML = getAttDropdown('Present');
+                r.insertBefore(td, r.lastChild);
+                calcAtt(td.querySelector('select'));
+            });
+        }
+        window.saveAttendance = async function() {
+            const b = document.querySelector('#attendance-buttons .btn-success'); b.innerText="Saving..."; b.disabled=true;
+            const batch = window.writeBatch(window.db);
+            const headers = document.querySelectorAll('.date-header-input');
+            document.querySelectorAll('#table-body tr').forEach(r => {
+                const id = r.getAttribute('data-id');
+                const log = {};
+                r.querySelectorAll('select').forEach((s,i) => { if(headers[i].value.trim()) log[headers[i].value.trim()] = s.value; });
+                const tot = parseInt(r.querySelector('.att-total').innerText)||0;
+                const up = {}; up[`attendance_logs.${currentTerm}`]=log; up[`attendance.${currentTerm}`]=tot;
+                batch.update(window.doc(window.db,"students",id), up);
+            });
+            await batch.commit(); alert("Saved!"); b.innerText="💾 Save Attendance"; b.disabled=false;
+        }
+        window.saveScores = async function() {
+            const b = document.querySelector('#scores-buttons .btn-success'); b.innerText="Saving..."; b.disabled=true;
+            const batch = window.writeBatch(window.db);
+            document.querySelectorAll('#table-body tr').forEach(r => {
+                const id = r.getAttribute('data-id');
+                const qs = r.querySelectorAll('.q-input');
+                const up = {};
+                up[`scores.${currentTerm}.q1`]=qs[0].value; up[`scores.${currentTerm}.q2`]=qs[1].value;
+                up[`scores.${currentTerm}.q3`]=qs[2].value; up[`scores.${currentTerm}.q4`]=qs[3].value;
+                up[`scores.${currentTerm}.q5`]=qs[4].value; up[`scores.${currentTerm}.proj`]=r.querySelector('.p-input').value;
+                up[`scores.${currentTerm}.exam`]=r.querySelector('.e-input').value; up[`grades.${currentTerm}`]=r.querySelector('.grade-cell').innerText;
+                batch.update(window.doc(window.db,"students",id), up);
+            });
+            await batch.commit(); alert("Saved!"); b.innerText="💾 Save Scores"; b.disabled=false;
+        }
+        window.processCSV = async function() {
+            const f = document.getElementById('csv-file'); if(!f.files.length) return alert("File?");
+            const r = new FileReader();
+            r.onload = async function(e) {
+                const lines = e.target.result.split(/\r?\n/);
+                let c=0;
+                for(let i=1; i<lines.length; i++) {
+                    const txt = lines[i]; if(!txt.trim()) continue;
+                    const row = txt.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+                    if(!row||row.length<5) continue;
+                    const cl = (v)=>v?v.replace(/^"|"$/g,'').trim():'';
+                    const uid=cl(row[0]), sec=cl(row[4]);
+                    try {
+                        await window.setDoc(window.doc(window.db,"students",uid+"_"+sec), {
+                            uid:uid, password:cl(row[1]), name:cl(row[2]), subject:cl(row[3]), section:sec, course:cl(row[5]), status:cl(row[6])||'Active'
+                        }, {merge:true});
+                        c++;
+                    } catch(err){console.error(err);}
+                }
+                alert("Uploaded "+c); location.reload();
+            };
+            r.readAsText(f.files[0]);
+        }
+
+        // --- 4. STUDENT PORTAL FUNCTIONS ---
+        function initStudentPortal() {
+            if (!studentData) return;
+            document.getElementById('student-name-display').innerText = `${studentData.name} (${studentData.course})`;
+            
+            document.getElementById('lbl-prelim-w').innerText = `${globalWeights.prelim}% Weight`;
+            document.getElementById('lbl-mid-w').innerText = `${globalWeights.midterm}% Weight`;
+            document.getElementById('lbl-fin-w').innerText = `${globalWeights.finals}% Weight`;
+
+            const g = studentData.grades || {};
+            const p = parseFloat(g.prelim) || null;
+            const m = parseFloat(g.midterm) || null;
+            const f = parseFloat(g.finals) || null;
+
+            document.getElementById('s-prelim').innerText = p !== null ? p : "--";
+            document.getElementById('s-midterm').innerText = m !== null ? m : "--";
+            document.getElementById('s-finals').innerText = f !== null ? f : "--";
+
+            const wP = globalWeights.prelim/100;
+            const wM = globalWeights.midterm/100;
+            const wF = globalWeights.finals/100;
+
+            if (p && m && f) {
+                const card = Math.round((p * wP) + (m * wM) + (f * wF));
+                document.getElementById('s-card').innerText = card;
+            } else {
+                document.getElementById('s-card').innerText = "--";
+            }
+            showStudentTerm('prelim', document.querySelector('.nav-link.active'));
+        }
+
+        window.showStudentTerm = function(term, btn) {
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const container = document.getElementById('student-term-detail');
+            const scores = (studentData.scores && studentData.scores[term]) ? studentData.scores[term] : {};
+            const att = (studentData.attendance && studentData.attendance[term]) ? studentData.attendance[term] : 0;
+            const logs = (studentData.attendance_logs && studentData.attendance_logs[term]) ? studentData.attendance_logs[term] : {};
+
+            container.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th>Component</th><th>Score</th></tr></thead>
+                            <tbody>
+                                <tr><td>Quiz 1</td><td>${scores.q1 || '-'}</td></tr>
+                                <tr><td>Quiz 2</td><td>${scores.q2 || '-'}</td></tr>
+                                <tr><td>Quiz 3</td><td>${scores.q3 || '-'}</td></tr>
+                                <tr><td>Quiz 4</td><td>${scores.q4 || '-'}</td></tr>
+                                <tr><td>Quiz 5</td><td>${scores.q5 || '-'}</td></tr>
+                                <tr><td><strong>Average Quizzes</strong></td><td><strong>${calcQuizAvg(scores)}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th>Component</th><th>Score</th></tr></thead>
+                            <tbody>
+                                <tr><td>Project</td><td>${scores.proj || '-'}</td></tr>
+                                <tr><td>Term Exam</td><td>${scores.exam || '-'}</td></tr>
+                                <tr><td>Attendance</td><td>${att}% <button class="btn btn-xs btn-link p-0" onclick="showAttModal('${term}')">(View Log)</button></td></tr>
+                                <tr class="table-primary"><td><strong>${term.toUpperCase()} GRADE</strong></td><td><strong>${(studentData.grades && studentData.grades[term]) || '-'}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            window.currentLogs = logs;
+        }
+
+        function calcQuizAvg(s) {
+            let sum=0, c=0;
+            ['q1','q2','q3','q4','q5'].forEach(k => {if(s[k]){sum+=parseFloat(s[k]); c++;}});
+            return c>0 ? (sum/c).toFixed(1) : '-';
+        }
+
+        window.showAttModal = function(term) {
+            const body = document.getElementById('att-modal-body');
+            const logs = window.currentLogs || {};
+            if (Object.keys(logs).length === 0) {
+                body.innerHTML = "<p>No attendance records for this term.</p>";
+            } else {
+                let html = "<table class='table table-striped'><thead><tr><th>Date</th><th>Status</th></tr></thead><tbody>";
+                Object.keys(logs).sort().forEach(d => {
+                    const st = logs[d];
+                    const color = st==='Present'?'text-success':st==='Absent'?'text-danger':st==='Late'?'text-warning':'text-primary';
+                    html += `<tr><td>${d}</td><td class="${color} fw-bold">${st}</td></tr>`;
+                });
+                html += "</tbody></table>";
+                body.innerHTML = html;
+            }
+            new bootstrap.Modal(document.getElementById('attModal')).show();
+        }
+
+        // --- TARGET CALCULATOR ---
+        window.calculateForecast = function() {
+            const target = parseFloat(document.getElementById('target-grade-input').value);
+            const p = parseFloat(document.getElementById('s-prelim').innerText);
+            const m = parseFloat(document.getElementById('s-midterm').innerText);
+            
+            const midBox = document.getElementById('f-midterm-box');
+            const finBox = document.getElementById('f-finals-box');
+            const midVal = document.getElementById('f-midterm');
+            const finVal = document.getElementById('f-finals');
+
+            midBox.classList.add('hidden'); finBox.classList.add('hidden');
+            if (!target || isNaN(p)) return;
+
+            const wP = globalWeights.prelim/100;
+            const wM = globalWeights.midterm/100;
+            const wF = globalWeights.finals/100;
+            
+            if (isNaN(m)) {
+                const remainingWeight = wM + wF;
+                const needed = (target - (p * wP)) / remainingWeight;
+                const rounded = Math.ceil(needed);
+                midBox.classList.remove('hidden'); finBox.classList.remove('hidden');
+                midVal.innerText = rounded > 100 ? "Impossible" : rounded;
+                finVal.innerText = rounded > 100 ? "Impossible" : rounded;
+            } else {
+                const needed = (target - (p * wP) - (m * wM)) / wF;
+                const rounded = Math.ceil(needed);
+                finBox.classList.remove('hidden');
+                finVal.innerText = rounded > 100 ? "Impossible" : rounded;
+            }
+        }
+    </script>
+</body>
+</html>
