@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevent Auto Zoom on Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GradeVault Portal</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
@@ -33,7 +33,12 @@
             overflow-x: hidden; 
         }
 
-        /* --- BACKGROUND ANIMATION (Floating Tech) --- */
+        /* Prevent Zoom on inputs for Mobile */
+        @media screen and (max-width: 768px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
+
+        /* --- BACKGROUND ANIMATION --- */
         .background-animation {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             overflow: hidden; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -42,51 +47,34 @@
             position: absolute; bottom: -100px; background: rgba(255, 255, 255, 0.6);
             border-radius: 10px; animation: floatUp 15s infinite linear;
         }
-        .bg-square:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-duration: 12s; animation-delay: 0s; }
+        .bg-square:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-duration: 12s; }
         .bg-square:nth-child(2) { width: 40px; height: 40px; left: 20%; animation-duration: 18s; animation-delay: 2s; }
         .bg-square:nth-child(3) { width: 100px; height: 100px; left: 35%; animation-duration: 25s; animation-delay: 4s; }
-        .bg-square:nth-child(4) { width: 50px; height: 50px; left: 50%; animation-duration: 15s; animation-delay: 0s; }
-        .bg-square:nth-child(5) { width: 90px; height: 90px; left: 65%; animation-duration: 20s; animation-delay: 1s; }
-        .bg-square:nth-child(6) { width: 120px; height: 120px; left: 80%; animation-duration: 30s; animation-delay: 5s; }
-        .bg-square:nth-child(7) { width: 60px; height: 60px; left: 90%; animation-duration: 16s; animation-delay: 3s; }
-
+        .bg-square:nth-child(4) { width: 50px; height: 50px; left: 50%; animation-duration: 15s; }
         @keyframes floatUp {
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             20% { opacity: 0.8; }
             100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* --- Custom Toast Notifications --- */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 1060; display: flex; flex-direction: column; gap: 10px; }
-        .custom-toast { background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); padding: 15px 20px; min-width: 300px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 5px solid var(--primary-blue); }
+        /* --- Custom Toast --- */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .custom-toast { background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); padding: 15px 20px; min-width: 300px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease; border-left: 5px solid var(--primary-blue); }
         .custom-toast.success { border-left-color: var(--success-green); }
         .custom-toast.error { border-left-color: var(--danger-red); }
-        .toast-icon { font-size: 1.2rem; }
-        .toast-msg { font-weight: 500; font-size: 0.95rem; }
-        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
         /* Navbar */
         .navbar { background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important; box-shadow: 0 4px 12px rgba(0, 64, 128, 0.15); padding: 0.8rem 0; }
         .navbar-brand { color: white !important; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; }
         .logo-box { background: rgba(255,255,255,0.2); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
-        .brand-text { letter-spacing: -0.5px; }
-        .brand-subtitle { font-weight: 300; opacity: 0.9; font-size: 0.85em; margin-left: 4px; }
-        .btn-outline-light { border-radius: 50px; font-size: 0.8rem; }
         .icon-btn { border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; }
 
-        /* Cards */
+        /* General UI */
         .card { border: none; border-radius: 12px; box-shadow: var(--card-shadow); background-color: white; margin-bottom: 1rem; }
         .hidden { display: none !important; }
-
-        /* Login */
-        #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 10; }
-        .login-container { width: 100%; max-width: 400px; padding: 35px 30px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 64, 128, 0.15); border-top: 6px solid var(--primary-blue); margin: 20px auto; }
-
-        /* Inputs & Buttons */
-        .form-control, .form-select { border-radius: 8px; border: 1px solid var(--border-light); padding: 10px 15px; background-color: #f8fafc; font-size: 16px; }
-        .form-control:focus, .form-select:focus { background-color: white; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1); }
-        .btn { border-radius: 8px; font-weight: 500; padding: 10px 20px; transition: all 0.2s; }
+        .btn { border-radius: 8px; font-weight: 500; transition: all 0.2s; }
         
         /* Tables */
         .table-responsive { border-radius: 12px; border: 1px solid var(--border-light); overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -94,72 +82,112 @@
         .table td { padding: 10px 12px; vertical-align: middle; white-space: nowrap; }
         .sticky-col { position: sticky; left: 0; background-color: white; z-index: 10; border-right: 2px solid var(--border-light) !important; color: var(--primary-blue); font-weight: 600; }
 
-        /* Inputs & Grades */
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .table-input { width: 60px; text-align: center; border: 1px solid transparent; background: transparent; border-radius: 4px; font-weight: 600; font-size: 1rem; padding: 5px 0; }
-        .table-input:focus { border-color: var(--primary-blue); background-color: white; outline: none; }
-        .grade-cell { font-weight: 800; font-size: 1rem; text-align: center; }
-        .failing-grade { color: var(--danger-red); background-color: #fff5f5; border-radius: 4px; }
-        .badge { padding: 5px 10px; border-radius: 30px; font-weight: 500; }
-
-        /* Student Portal */
-        .grade-card { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 15px; border: 1px solid var(--border-light); border-top: 4px solid var(--primary-blue); text-align: center; position: relative; }
-        .grade-value { font-size: 2.2rem; font-weight: 800; color: var(--primary-blue); line-height: 1.1; margin-bottom: 5px; }
-        .grade-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; }
+        /* --- STUDENT PORTAL SPECIFIC (Restored) --- */
+        .grade-card { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100%; padding: 25px 15px; text-align: center; 
+            border: 1px solid var(--border-light); border-top: 4px solid var(--primary-blue);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .grade-card:hover { transform: translateY(-3px); box-shadow: var(--hover-shadow); }
+        .grade-value { font-size: 2.5rem; font-weight: 800; color: var(--primary-blue); line-height: 1.1; margin: 10px 0; }
+        .grade-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
         
-        .forecast-box { background-color: #fff8f0; border: 1px dashed var(--warning-orange); padding: 5px; border-radius: 6px; margin-top: 10px; color: #856404; font-size: 0.85rem; }
-        .forecast-val { font-weight: 800; color: var(--warning-orange); font-size: 1rem; }
+        .forecast-box { 
+            background-color: #fff8f0; border: 1px dashed var(--warning-orange); 
+            padding: 4px 10px; border-radius: 6px; margin-top: 10px; 
+            color: #856404; font-size: 0.8rem; display: inline-block;
+        }
+        .forecast-val { font-weight: 800; color: var(--warning-orange); }
 
-        .card-progress-container { width: 100%; background-color: #e9ecef; border-radius: 4px; height: 6px; margin-top: 10px; overflow: hidden; }
+        .card-progress-container { width: 100%; background-color: #e9ecef; border-radius: 4px; height: 6px; margin-top: 15px; overflow: hidden; }
         .card-progress-bar { height: 100%; background-color: var(--success-green); width: 0%; transition: width 0.5s ease; }
 
-        /* Nav & Action Bar */
-        #student-subject-select { background-color: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; font-weight: 600; text-align: center; }
-        #student-subject-select option { background-color: var(--primary-blue); color: white; }
-        .nav-tabs { border-bottom: 2px solid var(--border-light); margin-bottom: 15px; flex-wrap: nowrap; overflow-x: auto; }
-        .nav-link { white-space: nowrap; color: var(--text-muted); font-weight: 600; border: none; padding: 10px 20px; }
-        .nav-link.active { color: var(--primary-blue); border-bottom: 3px solid var(--primary-blue); background: transparent; }
-        .action-bar { border-top: 1px solid var(--border-light); background: #f8f9fa; border-radius: 0 0 12px 12px; }
+        .target-calc-container { background: linear-gradient(to right, #ffffff, #f8faff); border-radius: 12px; }
+        
+        /* Washed out placeholder for My Goal */
+        #target-grade-input::placeholder { color: #cbd5e1; opacity: 0.5; font-weight: 400; }
 
-        #target-grade-input::placeholder { color: #d1d5db; font-weight: 400; }
+        .nav-tabs { border-bottom: 2px solid var(--border-light); margin-bottom: 20px; flex-wrap: nowrap; overflow-x: auto; }
+        .nav-link { color: var(--text-muted); font-weight: 600; border: none; padding: 12px 20px; margin-bottom: -2px; white-space: nowrap; border-radius: 8px 8px 0 0; transition: all 0.2s; }
+        .nav-link:hover { color: var(--primary-blue); background: rgba(0,0,0,0.02); }
+        .nav-link.active { color: var(--primary-blue); border-bottom: 3px solid var(--primary-blue); background: #f0f7ff; font-weight: 800; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .date-header-input { border: none; background: transparent; font-weight: 700; color: var(--primary-blue); width: 80px; text-align: center; font-size: 0.8rem; }
-        .att-cell { border-left: 1px solid rgba(0,0,0,0.05); } 
-        .att-select { border: none; background: transparent; font-weight: 600; cursor: pointer; text-align: center; -webkit-appearance: none; appearance: none; width: 100%; }
-        .att-present { color: var(--success-green); } .att-absent { color: var(--danger-red); } .att-late { color: var(--warning-orange); } .att-excused { color: var(--primary-blue); opacity: 0.7; }
 
-        .progress { height: 10px; border-radius: 5px; background-color: #e9ecef; overflow: hidden; margin-top: 10px; }
-        .progress-bar { background-color: var(--primary-blue); transition: width 0.3s ease; }
-
-        @media (min-width: 992px) {
-            #student-subject-select { width: auto; min-width: 250px; }
-            #student-name-display { margin-top: 0px; opacity: 0.9; }
+        /* --- MOBILE ENTRY APP INTERFACE --- */
+        #mobile-entry-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f8f9fa; z-index: 1080;
+            display: flex; flex-direction: column;
         }
+        .mobile-header {
+            background: white; padding: 15px; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
+        }
+        .mobile-body { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
+        .entry-card {
+            background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .entry-name { font-weight: 700; color: #333; font-size: 1rem; }
+        .entry-uid { font-size: 0.75rem; color: #999; }
+        
+        /* Scores Input Mobile */
+        .mobile-score-input {
+            width: 80px; height: 45px; font-size: 1.2rem; font-weight: bold;
+            text-align: center; border: 1px solid #ddd; border-radius: 8px;
+            background: #f8f9fa; color: var(--primary-blue);
+        }
+        .mobile-score-input:focus { border-color: var(--primary-blue); background: white; outline: none; }
+
+        /* Attendance Buttons Mobile */
+        .att-btn-group { display: flex; gap: 5px; }
+        .att-btn {
+            width: 40px; height: 40px; border-radius: 8px; border: 1px solid #eee;
+            font-weight: 700; background: white; color: #ccc;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .att-btn.active[data-val="Present"] { background: #d4edda; color: var(--success-green); border-color: var(--success-green); }
+        .att-btn.active[data-val="Late"] { background: #fff3cd; color: var(--warning-orange); border-color: var(--warning-orange); }
+        .att-btn.active[data-val="Excused"] { background: #cce5ff; color: var(--primary-blue); border-color: var(--primary-blue); }
+        .att-btn.active[data-val="Absent"] { background: #f8d7da; color: var(--danger-red); border-color: var(--danger-red); }
+
+        /* Selection Grids */
+        .comp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .comp-btn {
+            padding: 15px; border: 1px solid #eee; border-radius: 8px; background: white;
+            text-align: center; font-weight: 600; color: var(--text-main); transition: 0.2s;
+        }
+        .comp-btn:hover { border-color: var(--primary-blue); background: #f0f7ff; }
+        .comp-btn.has-data { background-color: #d4edda; border-color: var(--success-green); color: var(--success-green); }
+
+        /* Existing Styles reused */
+        #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { width: 100%; max-width: 400px; padding: 35px 30px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 64, 128, 0.15); border-top: 6px solid var(--primary-blue); }
+        .grade-cell { font-weight: 800; }
+        .failing-grade { color: var(--danger-red); background-color: #fff5f5; }
+
+        /* Media Queries for Responsive */
         @media (max-width: 991px) {
-            .container-fluid { padding-left: 15px; padding-right: 15px; }
-            .card .row.g-3 > div { width: 100%; margin-bottom: 10px; }
-            .action-bar { flex-direction: column; gap: 10px; }
-            .action-bar button { width: 100% !important; }
-            #attendance-buttons { flex-direction: column; width: 100%; gap: 10px; }
+            .navbar-brand { font-size: 1.1rem; }
             .col-sm-6 { width: 50%; }
             .target-calc-container { flex-direction: column; align-items: flex-start !important; }
-            .target-calc-input { width: 100% !important; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-            .navbar-brand { font-size: 1.1rem; }
-            #student-subject-select { width: 100%; margin-top: 5px; }
-            #student-name-display { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.9); margin-top: 5px; display: block; width: 100%; text-align: center; }
+            .target-calc-input { width: 100% !important; margin-top: 10px; justify-content: space-between; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Animation Background -->
     <div class="background-animation">
         <div class="bg-square"></div><div class="bg-square"></div><div class="bg-square"></div>
-        <div class="bg-square"></div><div class="bg-square"></div><div class="bg-square"></div>
-        <div class="bg-square"></div>
+        <div class="bg-square"></div><div class="bg-square"></div>
     </div>
 
-    <!-- Toast Container -->
     <div id="toast-container"></div>
 
     <!-- 1. LOGIN SECTION -->
@@ -173,7 +201,7 @@
             </h3>
             <div class="mb-3">
                 <label class="form-label">User ID / Email</label>
-                <input type="text" id="login-uid" class="form-control" placeholder="ID or Email" onkeydown="if(event.key==='Enter') handleLogin()">
+                <input type="text" id="login-uid" class="form-control" placeholder="ID or Email">
             </div>
             <div class="mb-4">
                 <label class="form-label">Password</label>
@@ -193,7 +221,7 @@
                 <span class="navbar-brand">
                     <div class="logo-box"><i class="bi bi-mortarboard-fill"></i></div>
                     <span class="brand-text">GradeVault</span>
-                    <span class="brand-subtitle">Teacher</span>
+                    <span class="brand-subtitle ms-2 small opacity-75">Teacher</span>
                 </span>
                 <button onclick="logout()" class="btn btn-outline-light icon-btn" title="Sign Out"><i class="bi bi-power"></i></button>
             </div>
@@ -205,37 +233,35 @@
                         <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
                             <h6 class="mb-0 text-primary fw-bold">Class Management</h6>
                             <div class="d-flex gap-2">
-                                <button onclick="document.getElementById('import-modal').classList.remove('hidden')" class="btn btn-sm btn-outline-secondary fw-bold" title="Import CSV">
+                                <button onclick="document.getElementById('import-modal').classList.remove('hidden')" class="btn btn-sm btn-outline-secondary fw-bold">
                                     <i class="bi bi-folder-plus"></i> <span class="d-none d-md-inline">Import</span>
                                 </button>
-                                <button onclick="openSettingsModal()" class="btn btn-sm btn-outline-primary fw-bold" title="Configuration">
+                                <button onclick="openSettingsModal()" class="btn btn-sm btn-outline-primary fw-bold">
                                     <i class="bi bi-gear"></i> <span class="d-none d-md-inline">Config</span>
                                 </button>
                             </div>
                         </div>
                         <div class="row g-3 align-items-end">
-                            <div class="col-md-3 col-12">
-                                <label class="form-label">Term</label>
-                                <select id="term-select" class="form-select">
-                                    <option value="prelim">Prelim</option>
-                                    <option value="midterm">Midterm</option>
-                                    <option value="finals">Finals</option>
-                                </select>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label small fw-bold text-muted">Term</label>
+                                <select id="term-select" class="form-select"><option value="prelim">Prelim</option><option value="midterm">Midterm</option><option value="finals">Finals</option></select>
                             </div>
-                            <div class="col-md-4 col-12">
-                                <label class="form-label">Section</label>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label small fw-bold text-muted">Section</label>
                                 <select id="section-select" class="form-select"><option value="">Loading...</option></select>
                             </div>
                             <div class="col-md-3 col-12">
-                                <label class="form-label">View Mode</label>
+                                <label class="form-label small fw-bold text-muted">Action</label>
                                 <select id="view-mode" class="form-select" onchange="toggleTeacherButtons()">
-                                    <option value="list">Student List</option>
-                                    <option value="scores">Scores</option>
-                                    <option value="attendance">Attendance</option>
+                                    <option value="list">View Student List</option>
+                                    <option value="scores">Manage Scores</option>
+                                    <option value="attendance">Manage Attendance</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 col-12">
-                                <button onclick="loadClassList()" class="btn btn-primary w-100 fw-bold">Load List</button>
+                            <div class="col-md-3 col-12 d-flex gap-2">
+                                <!-- Dynamic Buttons appear here based on view mode -->
+                                <button id="btn-load-list" onclick="loadClassList()" class="btn btn-primary w-100 fw-bold">Load List</button>
+                                <button id="btn-log-records" onclick="openLogSelectionModal()" class="btn btn-success w-100 fw-bold hidden"><i class="bi bi-pencil-square"></i> Log</button>
                             </div>
                         </div>
                     </div>
@@ -246,7 +272,7 @@
                 <div class="card p-0 overflow-hidden shadow-sm">
                     <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
                         <h6 id="table-title" class="m-0 fw-bold text-primary">Class List</h6>
-                        <span class="badge bg-light text-dark border">Live</span>
+                        <span class="badge bg-light text-dark border">Read Only View</span>
                     </div>
                     <div class="table-responsive border-0">
                         <table class="table table-hover mb-0" id="data-table">
@@ -254,21 +280,34 @@
                             <tbody id="table-body"></tbody>
                         </table>
                     </div>
-                    <div id="bottom-action-bar" class="action-bar p-3 d-flex justify-content-end gap-2 hidden">
-                        <div id="scores-buttons" class="hidden w-100 d-flex justify-content-end">
-                            <button onclick="saveScores()" class="btn btn-success px-4 fw-bold shadow-sm">💾 Save Scores</button>
-                        </div>
-                        <div id="attendance-buttons" class="hidden w-100 d-flex justify-content-between align-items-center">
-                            <button onclick="addDateColumn()" class="btn btn-outline-primary fw-bold">+ Date</button>
-                            <button onclick="saveAttendance()" class="btn btn-success px-4 fw-bold shadow-sm">💾 Save Log</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 3. STUDENT PORTAL -->
+    <!-- 3. MOBILE ENTRY APP (Full Screen Overlay) -->
+    <div id="mobile-entry-page" class="hidden">
+        <div class="mobile-header">
+            <div>
+                <div class="small text-muted fw-bold" id="mobile-subtitle">SECTION - TERM</div>
+                <div class="h5 mb-0 fw-bold text-primary" id="mobile-title">Component Name</div>
+            </div>
+            <button onclick="closeMobileEntry()" class="btn btn-light fw-bold text-muted border">Done</button>
+        </div>
+        
+        <div class="mobile-body" id="mobile-entry-list">
+            <!-- Dynamic Content -->
+        </div>
+
+        <div class="p-3 bg-white border-top fixed-bottom shadow-lg d-flex justify-content-between align-items-center">
+            <span class="small text-muted" id="mobile-status">Ready to save.</span>
+            <button onclick="saveMobileBatch()" class="btn btn-primary px-4 fw-bold shadow">
+                <i class="bi bi-cloud-upload"></i> Save All
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. STUDENT PORTAL -->
     <div id="student-section" class="hidden">
         <nav class="navbar navbar-expand-lg mb-4">
             <div class="container px-3">
@@ -315,7 +354,6 @@
                 </div>
             </div>
             
-            <!-- Grade Cards with Progress Bars -->
             <div class="row mb-4 g-3">
                 <div class="col-md-3 col-sm-6 col-6">
                     <div class="card grade-card">
@@ -323,9 +361,7 @@
                         <div class="grade-value" id="s-prelim">--</div>
                         <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-prelim-w">--%</div>
                         <div class="forecast-box hidden" id="f-prelim-box"><div class="forecast-val" id="f-prelim">--</div></div>
-                        <div class="card-progress-container hidden" id="p-prelim-bar-box">
-                            <div class="card-progress-bar" id="p-prelim-bar"></div>
-                        </div>
+                        <div class="card-progress-container hidden" id="p-prelim-bar-box"><div class="card-progress-bar" id="p-prelim-bar"></div></div>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-6">
@@ -334,9 +370,7 @@
                         <div class="grade-value" id="s-midterm">--</div>
                         <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-mid-w">--%</div>
                         <div class="forecast-box hidden" id="f-midterm-box"><div class="forecast-val" id="f-midterm">--</div></div>
-                        <div class="card-progress-container hidden" id="p-midterm-bar-box">
-                            <div class="card-progress-bar" id="p-midterm-bar"></div>
-                        </div>
+                        <div class="card-progress-container hidden" id="p-midterm-bar-box"><div class="card-progress-bar" id="p-midterm-bar"></div></div>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-6">
@@ -345,9 +379,7 @@
                         <div class="grade-value" id="s-finals">--</div>
                         <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-fin-w">--%</div>
                         <div class="forecast-box hidden" id="f-finals-box"><div class="forecast-val" id="f-finals">--</div></div>
-                        <div class="card-progress-container hidden" id="p-finals-bar-box">
-                            <div class="card-progress-bar" id="p-finals-bar"></div>
-                        </div>
+                        <div class="card-progress-container hidden" id="p-finals-bar-box"><div class="card-progress-bar" id="p-finals-bar"></div></div>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-6">
@@ -355,9 +387,7 @@
                         <div class="grade-label text-success">Total</div>
                         <div class="grade-value text-success" id="s-card">--</div>
                         <div class="small text-muted mt-1" style="font-size:0.7em">Final Grade</div>
-                        <div class="card-progress-container hidden" id="p-card-bar-box">
-                            <div class="card-progress-bar" id="p-card-bar"></div>
-                        </div>
+                        <div class="card-progress-container hidden" id="p-card-bar-box"><div class="card-progress-bar" id="p-card-bar"></div></div>
                     </div>
                 </div>
             </div>
@@ -379,6 +409,7 @@
     </div>
 
     <!-- MODALS -->
+    <!-- 1. Settings -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
@@ -408,29 +439,24 @@
         </div>
     </div>
 
+    <!-- 2. Import CSV -->
     <div id="import-modal" class="card p-4 hidden shadow-lg" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:400px; z-index:1050; border-top: 5px solid var(--primary-blue);">
         <h6 class="mb-3 fw-bold">Import Student Data</h6>
         <div class="mb-3">
             <input type="file" id="csv-file" accept=".csv" class="form-control">
             <div class="form-text small">Select formatted CSV.</div>
         </div>
-        
         <div id="import-progress-container" class="hidden mb-3">
-            <div class="d-flex justify-content-between small mb-1">
-                <span>Uploading...</span>
-                <span id="progress-percent">0%</span>
-            </div>
-            <div class="progress">
-                <div id="import-progress-bar" class="progress-bar" style="width: 0%"></div>
-            </div>
+            <div class="d-flex justify-content-between small mb-1"><span>Uploading...</span><span id="progress-percent">0%</span></div>
+            <div class="progress"><div id="import-progress-bar" class="progress-bar" style="width: 0%"></div></div>
         </div>
-
         <div class="d-flex justify-content-end gap-2">
             <button onclick="document.getElementById('import-modal').classList.add('hidden')" class="btn btn-light btn-sm">Cancel</button>
             <button onclick="processCSV()" class="btn btn-primary btn-sm">Upload</button>
         </div>
     </div>
 
+    <!-- 3. Attendance View Modal (Student Side) -->
     <div class="modal fade" id="attModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content border-0">
@@ -439,6 +465,50 @@
                     <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-0" id="att-modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Score Selection Modal (Teacher Side) -->
+    <div class="modal fade" id="scoreSelectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-primary text-white">
+                    <h6 class="modal-title fw-bold">Select Component to Log</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3">
+                    <p class="small text-muted mb-3">Green items have existing data.</p>
+                    <div class="comp-grid" id="score-comp-grid">
+                        <!-- Dynamic Buttons -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Date Selection Modal (Teacher Side) -->
+    <div class="modal fade" id="dateSelectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-primary text-white">
+                    <h6 class="modal-title fw-bold">Select Date to Log</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Add New Date</label>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="new-att-date" class="form-control" placeholder="e.g. 10/25">
+                            <button onclick="launchMobileEntry('attendance', document.getElementById('new-att-date').value)" class="btn btn-success fw-bold">Go</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <label class="form-label small fw-bold">Edit Existing Date</label>
+                    <div class="list-group" id="date-list-group">
+                        <!-- Dynamic List -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -460,21 +530,11 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        window.db = db;
-        window.auth = auth;
-        window.collection = collection;
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.getDoc = getDoc;
-        window.getDocs = getDocs;
-        window.query = query;
-        window.where = where;
-        window.writeBatch = writeBatch;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.signOut = signOut;
+        window.db = getFirestore(app);
+        window.auth = getAuth(app);
+        window.collection = collection; window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
+        window.getDocs = getDocs; window.query = query; window.where = where; window.writeBatch = writeBatch;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.signOut = signOut;
     </script>
 
     <script>
@@ -483,14 +543,14 @@
         let existingDates = [];
         let allStudentSubjects = [];
         let activeStudentSubject = null;
-
-        // ======================================================
-        // PASTE YOUR ADMIN UID HERE
-        // ======================================================
-        const ADMIN_UID = "Xv71xkRee8grRRhpfO2WYKoQhEC2"; 
-        // ======================================================
-
         let globalWeights = { quiz: 20, project: 30, exam: 40, attendance: 10, prelim: 25, midterm: 35, finals: 40 };
+
+        // For Mobile Entry
+        let activeEntryType = null; // 'scores' or 'attendance'
+        let activeEntryKey = null; // 'q1', 'exam', '10/25', etc.
+        let entryChanges = {}; // Stores temp changes before save
+
+        const ADMIN_UID = "Xv71xkRee8grRRhpfO2WYKoQhEC2"; 
 
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -512,10 +572,7 @@
             const spinner = document.getElementById('login-spinner');
 
             if (!uidInput || !passInput) { showToast("Enter credentials", "error"); return; }
-            
-            btn.disabled = true;
-            spinner.classList.remove('d-none');
-
+            btn.disabled = true; spinner.classList.remove('d-none');
             await fetchSettings();
 
             try {
@@ -532,38 +589,26 @@
                     const snapshot = await window.getDocs(q);
                     if (!snapshot.empty) {
                         allStudentSubjects = [];
-                        snapshot.forEach(doc => {
-                            // Filter out dropped subjects!
-                            const d = doc.data();
-                            if (d.status !== "Dropped") {
-                                allStudentSubjects.push(d);
-                            }
-                        });
-                        
-                        if (allStudentSubjects.length === 0) {
-                            throw new Error("No active subjects found.");
-                        }
-
+                        snapshot.forEach(doc => { if (doc.data().status !== "Dropped") allStudentSubjects.push(doc.data()); });
+                        if (allStudentSubjects.length === 0) throw new Error("No active subjects found.");
                         document.getElementById('login-section').classList.add('hidden');
                         document.getElementById('student-section').classList.remove('hidden');
                         initStudentPortal();
                         showToast("Welcome Student!");
                     } else { throw new Error("Invalid Credentials"); }
                 }
-            } catch (error) { 
-                showToast(error.message, "error"); 
-                btn.disabled = false;
-                spinner.classList.add('d-none');
-            }
+            } catch (error) { showToast(error.message, "error"); btn.disabled = false; spinner.classList.add('d-none'); }
         }
 
         function logout() { window.signOut(window.auth).then(() => location.reload()).catch(() => location.reload()); }
+
         async function fetchSettings() {
             try {
                 const docSnap = await window.getDoc(window.doc(window.db, "settings", "config"));
                 if (docSnap.exists()) globalWeights = docSnap.data();
-            } catch (e) { console.error("Error loading settings:", e); }
+            } catch (e) { console.error(e); }
         }
+
         window.openSettingsModal = function() {
             document.getElementById('w-quiz').value = globalWeights.quiz;
             document.getElementById('w-proj').value = globalWeights.project;
@@ -574,6 +619,7 @@
             document.getElementById('w-fin').value = globalWeights.finals;
             new bootstrap.Modal(document.getElementById('settingsModal')).show();
         }
+
         window.saveSettings = async function() {
             const newWeights = {
                 quiz: parseFloat(document.getElementById('w-quiz').value),
@@ -584,10 +630,9 @@
                 midterm: parseFloat(document.getElementById('w-mid').value),
                 finals: parseFloat(document.getElementById('w-fin').value)
             };
-            const compTotal = newWeights.quiz + newWeights.project + newWeights.exam + newWeights.attendance;
-            const termTotal = newWeights.prelim + newWeights.midterm + newWeights.finals;
-            if (compTotal !== 100) { showToast(`Components must be 100%`, "error"); return; }
-            if (termTotal !== 100) { showToast(`Term Weights must be 100%`, "error"); return; }
+            if ((newWeights.quiz + newWeights.project + newWeights.exam + newWeights.attendance) !== 100) return showToast(`Components must be 100%`, "error");
+            if ((newWeights.prelim + newWeights.midterm + newWeights.finals) !== 100) return showToast(`Term Weights must be 100%`, "error");
+            
             try {
                 await window.setDoc(window.doc(window.db, "settings", "config"), newWeights);
                 globalWeights = newWeights;
@@ -596,15 +641,22 @@
                 if(activeStudentSubject) renderStudentPage(activeStudentSubject);
             } catch (e) { showToast(e.message, "error"); }
         }
+
+        // --- TEACHER VIEW LOGIC UPDATED ---
         function toggleTeacherButtons() {
             const mode = document.getElementById('view-mode').value;
-            const bar = document.getElementById('bottom-action-bar');
-            const scoresBtn = document.getElementById('scores-buttons');
-            const attBtn = document.getElementById('attendance-buttons');
-            bar.classList.add('hidden'); scoresBtn.classList.add('hidden'); attBtn.classList.add('hidden');
-            if (mode === 'scores') { bar.classList.remove('hidden'); scoresBtn.classList.remove('hidden'); }
-            else if (mode === 'attendance') { bar.classList.remove('hidden'); attBtn.classList.remove('hidden'); }
+            const btnLoad = document.getElementById('btn-load-list');
+            const btnLog = document.getElementById('btn-log-records');
+            
+            if (mode === 'list') {
+                btnLoad.classList.remove('hidden'); btnLoad.classList.add('w-100');
+                btnLog.classList.add('hidden');
+            } else {
+                btnLoad.classList.remove('hidden'); btnLoad.classList.remove('w-100'); btnLoad.classList.add('w-50');
+                btnLog.classList.remove('hidden'); btnLog.classList.add('w-50');
+            }
         }
+
         async function fetchSectionsForDropdown() {
             const select = document.getElementById('section-select');
             try {
@@ -614,54 +666,39 @@
                 querySnapshot.forEach(doc => { if(doc.data().section) sections.add(doc.data().section); });
                 select.innerHTML = '<option value="">Select Section</option>';
                 Array.from(sections).sort().forEach(sec => {
-                    const opt = document.createElement('option');
-                    opt.value = sec; opt.textContent = sec; select.appendChild(opt);
+                    const opt = document.createElement('option'); opt.value = sec; opt.textContent = sec; select.appendChild(opt);
                 });
             } catch (e) { console.error(e); }
         }
+
         async function loadClassList() {
             const section = document.getElementById('section-select').value;
             currentTerm = document.getElementById('term-select').value;
             const mode = document.getElementById('view-mode').value;
             if (!section) { showToast("Select a section", "error"); return; }
-            toggleTeacherButtons();
+            
             const q = window.query(window.collection(window.db, "students"), window.where("section", "==", section));
             const snapshot = await window.getDocs(q);
             currentStudents = [];
             snapshot.forEach(doc => { let d = doc.data(); d.docID = doc.id; currentStudents.push(d); });
             currentStudents.sort((a, b) => a.name.localeCompare(b.name));
-            if (mode === 'attendance') {
-                const dateSet = new Set();
-                currentStudents.forEach(s => {
-                    if (s.attendance_logs && s.attendance_logs[currentTerm]) 
-                        Object.keys(s.attendance_logs[currentTerm]).forEach(d => dateSet.add(d));
-                });
-                existingDates = Array.from(dateSet).sort();
-                const minCols = 10;
-                while (existingDates.length < minCols) { existingDates.push(""); }
-            }
+            
+            // Extract dates for table view
+            const dateSet = new Set();
+            currentStudents.forEach(s => {
+                if (s.attendance_logs && s.attendance_logs[currentTerm]) 
+                    Object.keys(s.attendance_logs[currentTerm]).forEach(d => dateSet.add(d));
+            });
+            existingDates = Array.from(dateSet).sort();
+            
             renderTable(currentStudents, mode, currentTerm);
-        }
-        
-        window.handleTableEnter = function(e, input) {
-            if (e.key !== 'Enter') return;
-            e.preventDefault();
-            const td = input.closest('td');
-            const tr = td.closest('tr');
-            const colIndex = Array.from(tr.children).indexOf(td);
-            const nextTr = tr.nextElementSibling;
-            if (nextTr) {
-                const nextTd = nextTr.children[colIndex];
-                const nextInput = nextTd.querySelector('input');
-                if (nextInput) nextInput.focus();
-            }
         }
 
         function renderTable(students, mode, term) {
             const tbody = document.getElementById('table-body');
             const thead = document.getElementById('table-head');
             document.getElementById('results-area').classList.remove('hidden');
-            document.getElementById('table-title').innerText = `Section ${students[0]?.section || ''} | ${term.toUpperCase()} (${mode})`;
+            document.getElementById('table-title').innerText = `Section ${students[0]?.section || ''} | ${term.toUpperCase()}`;
             tbody.innerHTML = ''; thead.innerHTML = '';
             
             if (mode === 'list') {
@@ -676,117 +713,245 @@
                     const sc = (s.scores && s.scores[term]) ? s.scores[term] : {};
                     const g = (s.grades && s.grades[term]) ? s.grades[term] : "";
                     const att = (s.attendance && s.attendance[term]) ? s.attendance[term] : 0;
-                    tbody.innerHTML += `
-                        <tr data-id="${s.docID}">
-                            <td class="sticky-col">${s.name}</td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q1||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q2||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q3||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q4||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td><input type="number" class="table-input q-input" value="${sc.q5||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td><input type="number" class="table-input p-input" value="${sc.proj||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td><input type="number" class="table-input e-input" value="${sc.exam||''}" oninput="calcRow(this)" onkeydown="handleTableEnter(event, this)"></td>
-                            <td class="text-center att-score">${att}%</td>
-                            <td class="grade-cell ${g<75&&g!==''?'failing-grade':''}">${g}</td>
-                        </tr>`;
+                    tbody.innerHTML += `<tr><td class="sticky-col">${s.name}</td><td>${sc.q1||'-'}</td><td>${sc.q2||'-'}</td><td>${sc.q3||'-'}</td><td>${sc.q4||'-'}</td><td>${sc.q5||'-'}</td><td>${sc.proj||'-'}</td><td>${sc.exam||'-'}</td><td class="text-center">${att}%</td><td class="grade-cell ${g<75&&g!==''?'failing-grade':''}">${g}</td></tr>`;
                 });
             } else if (mode === 'attendance') {
-                let h = `<tr id="att-head"><th class="sticky-col">Name</th>`;
-                existingDates.forEach(d => h += `<th><input type="text" class="date-header-input" value="${d}"></th>`);
-                h += `<th width="80" class="bg-light">Total</th></tr>`;
+                let h = `<tr><th class="sticky-col">Name</th>`;
+                existingDates.forEach(d => h += `<th>${d}</th>`);
+                h += `<th class="bg-light">Total</th></tr>`;
                 thead.innerHTML = h;
                 students.forEach(s => {
                     if (s.status === "Dropped") return;
                     const logs = (s.attendance_logs && s.attendance_logs[term]) ? s.attendance_logs[term] : {};
-                    let r = `<tr data-id="${s.docID}"><td class="sticky-col">${s.name}</td>`;
+                    let r = `<tr><td class="sticky-col">${s.name}</td>`;
                     existingDates.forEach(d => {
-                        let val = "";
-                        if (d !== "") { val = logs[d] || ""; }
-                        r += `<td class="att-cell">${getAttDropdown(val)}</td>`;
+                         const val = logs[d] || "";
+                         const color = val==='Present'?'text-success':val==='Absent'?'text-danger':val==='Late'?'text-warning':'text-primary';
+                         r += `<td class="fw-bold ${color}">${val.substring(0,1)}</td>`;
                     });
-                    r += `<td class="text-center fw-bold att-total">${(s.attendance && s.attendance[term])?s.attendance[term]:0}%</td></tr>`;
+                    r += `<td class="text-center fw-bold">${(s.attendance && s.attendance[term])?s.attendance[term]:0}%</td></tr>`;
                     tbody.innerHTML += r;
                 });
             }
         }
-        window.calcRow = function(el) {
-            const row = el.closest('tr');
-            const qs = Array.from(row.querySelectorAll('.q-input')).map(i => i.value);
-            const p = parseFloat(row.querySelector('.p-input').value)||0;
-            const e = parseFloat(row.querySelector('.e-input').value)||0;
-            const a = parseFloat(row.querySelector('.att-score').innerText)||0;
-            let sum=0, cnt=0;
-            qs.forEach(v => {if(v!==""){sum+=parseFloat(v); cnt++;}});
-            if(cnt===0 && p===0 && e===0) return; 
-            const wQ = globalWeights.quiz / 100;
-            const wP = globalWeights.project / 100;
-            const wE = globalWeights.exam / 100;
-            const wA = globalWeights.attendance / 100;
-            const final = Math.round(((cnt>0?sum/cnt:0)*wQ) + (p*wP) + (e*wE) + (a*wA));
-            const cell = row.querySelector('.grade-cell');
-            cell.innerText = final;
-            if(final<75) cell.classList.add('failing-grade'); else cell.classList.remove('failing-grade');
+
+        // --- NEW LOGIC FOR "LOG RECORDS" (NATIVE APP FEEL) ---
+
+        window.openLogSelectionModal = async function() {
+            const section = document.getElementById('section-select').value;
+            if(!section) { showToast("Select Section first", "error"); return; }
+            
+            // Ensure data is loaded to know what's filled
+            if(currentStudents.length === 0) await loadClassList();
+            
+            const mode = document.getElementById('view-mode').value;
+            if (mode === 'scores') {
+                renderScoreSelectionModal();
+                new bootstrap.Modal(document.getElementById('scoreSelectModal')).show();
+            } else if (mode === 'attendance') {
+                renderDateSelectionModal();
+                new bootstrap.Modal(document.getElementById('dateSelectModal')).show();
+            }
         }
-        function getAttDropdown(v) {
-            const c = v==='Present'?'att-present':v==='Absent'?'att-absent':v==='Late'?'att-late':v==='Excused'?'att-excused':'';
-            return `<select class="att-select ${c}" onchange="this.className='att-select '+ (this.value==='Present'?'att-present':this.value==='Absent'?'att-absent':this.value==='Late'?'att-late':this.value==='Excused'?'att-excused':''); calcAtt(this)">
-                <option value="" ${v===''?'selected':''}></option>
-                <option value="Present" ${v==='Present'?'selected':''}>P</option>
-                <option value="Late" ${v==='Late'?'selected':''}>L</option>
-                <option value="Excused" ${v==='Excused'?'selected':''}>E</option>
-                <option value="Absent" ${v==='Absent'?'selected':''}>A</option></select>`;
-        }
-        window.calcAtt = function(el) {
-            const row = el.closest('tr');
-            const sels = row.querySelectorAll('select');
-            const headers = document.querySelectorAll('.date-header-input');
-            let pts=0, max=0;
-            sels.forEach((s,i) => {
-                if(headers[i] && headers[i].value.trim()!=="" && s.value !== "") { max++; if(s.value!=='Absent') pts++; }
+
+        function renderScoreSelectionModal() {
+            const grid = document.getElementById('score-comp-grid');
+            const components = ['q1','q2','q3','q4','q5','proj','exam'];
+            const labels = {'q1':'Quiz 1','q2':'Quiz 2','q3':'Quiz 3','q4':'Quiz 4','q5':'Quiz 5','proj':'Project','exam':'Exam'};
+            grid.innerHTML = '';
+            
+            components.forEach(comp => {
+                // Check if data exists for this component
+                let filledCount = 0;
+                currentStudents.forEach(s => {
+                    if (s.scores && s.scores[currentTerm] && s.scores[currentTerm][comp]) filledCount++;
+                });
+                const hasData = filledCount > 0;
+                
+                grid.innerHTML += `<div class="comp-btn ${hasData?'has-data':''}" onclick="launchMobileEntry('scores', '${comp}')">${labels[comp]}</div>`;
             });
-            row.querySelector('.att-total').innerText = (max>0?Math.round((pts/max)*100):0) + "%";
         }
-        window.addDateColumn = function() {
-            existingDates.push(""); 
-            renderTable(currentStudents, 'attendance', currentTerm); 
+
+        function renderDateSelectionModal() {
+            const list = document.getElementById('date-list-group');
+            list.innerHTML = '';
+            existingDates.forEach(d => {
+                list.innerHTML += `<button class="list-group-item list-group-item-action fw-bold text-primary" onclick="launchMobileEntry('attendance', '${d}')">${d}</button>`;
+            });
+            document.getElementById('new-att-date').value = '';
         }
-        window.saveAttendance = async function() {
+
+        window.launchMobileEntry = function(type, key) {
+            if (!key) return;
+            // Close modals
+            bootstrap.Modal.getInstance(document.getElementById('scoreSelectModal'))?.hide();
+            bootstrap.Modal.getInstance(document.getElementById('dateSelectModal'))?.hide();
+
+            activeEntryType = type;
+            activeEntryKey = key;
+            entryChanges = {}; // Reset changes
+
+            // Set Header Info
+            const section = document.getElementById('section-select').value;
+            const term = document.getElementById('term-select').value;
+            const compLabel = type==='scores' ? key.toUpperCase() : `Att: ${key}`;
+            
+            document.getElementById('mobile-subtitle').innerText = `${section} - ${term.toUpperCase()}`;
+            document.getElementById('mobile-title').innerText = compLabel;
+
+            // Render List
+            const listContainer = document.getElementById('mobile-entry-list');
+            listContainer.innerHTML = '';
+
+            currentStudents.forEach(s => {
+                if (s.status === 'Dropped') return;
+                
+                let html = `<div class="entry-card" data-id="${s.docID}">
+                    <div><div class="entry-name">${s.name}</div><div class="entry-uid">${s.uid}</div></div>`;
+                
+                if (type === 'scores') {
+                    const val = (s.scores && s.scores[term] && s.scores[term][key]) ? s.scores[term][key] : '';
+                    html += `<input type="number" class="mobile-score-input" value="${val}" onchange="trackChange('${s.docID}', this.value)" onkeydown="handleMobileEnter(event, this)">`;
+                } else {
+                    const logs = (s.attendance_logs && s.attendance_logs[term]) ? s.attendance_logs[term] : {};
+                    const val = logs[key] || '';
+                    html += `<div class="att-btn-group">
+                        <div class="att-btn ${val==='Present'?'active':''}" data-val="Present" onclick="toggleAtt(this, '${s.docID}')">P</div>
+                        <div class="att-btn ${val==='Late'?'active':''}" data-val="Late" onclick="toggleAtt(this, '${s.docID}')">L</div>
+                        <div class="att-btn ${val==='Excused'?'active':''}" data-val="Excused" onclick="toggleAtt(this, '${s.docID}')">E</div>
+                        <div class="att-btn ${val==='Absent'?'active':''}" data-val="Absent" onclick="toggleAtt(this, '${s.docID}')">A</div>
+                    </div>`;
+                }
+                html += `</div>`;
+                listContainer.innerHTML += html;
+            });
+
+            // Show UI
+            document.getElementById('teacher-section').classList.add('hidden');
+            document.getElementById('mobile-entry-page').classList.remove('hidden');
+        }
+
+        window.handleMobileEnter = function(e, el) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const inputs = Array.from(document.querySelectorAll('.mobile-score-input'));
+                const idx = inputs.indexOf(el);
+                if (idx < inputs.length - 1) {
+                    inputs[idx + 1].focus();
+                } else {
+                    el.blur(); // Force change event
+                    saveMobileBatch();
+                }
+            }
+        }
+
+        window.closeMobileEntry = function() {
+            document.getElementById('mobile-entry-page').classList.add('hidden');
+            document.getElementById('teacher-section').classList.remove('hidden');
+            loadClassList(); // Refresh table view
+        }
+
+        window.trackChange = function(docID, val) {
+            entryChanges[docID] = val;
+            document.getElementById('mobile-status').innerText = "Unsaved changes...";
+        }
+
+        window.toggleAtt = function(el, docID) {
+            // Remove active from siblings
+            const siblings = el.parentElement.children;
+            let newVal = el.getAttribute('data-val');
+            
+            if (el.classList.contains('active')) {
+                el.classList.remove('active');
+                newVal = ""; // Deselect
+            } else {
+                for (let btn of siblings) btn.classList.remove('active');
+                el.classList.add('active');
+            }
+            trackChange(docID, newVal);
+        }
+
+        window.saveMobileBatch = async function() {
             const batch = window.writeBatch(window.db);
-            const headers = document.querySelectorAll('.date-header-input');
-            document.querySelectorAll('#table-body tr').forEach(r => {
-                const id = r.getAttribute('data-id');
-                const log = {};
-                r.querySelectorAll('select').forEach((s,i) => { if(headers[i].value.trim() && s.value) { log[headers[i].value.trim()] = s.value; } });
-                const tot = parseInt(r.querySelector('.att-total').innerText)||0;
-                const up = {}; up[`attendance_logs.${currentTerm}`]=log; up[`attendance.${currentTerm}`]=tot;
-                batch.update(window.doc(window.db,"students",id), up);
-            });
-            await batch.commit(); showToast("Attendance Saved");
+            const term = currentTerm;
+            
+            if (Object.keys(entryChanges).length === 0) { showToast("No changes to save"); return; }
+            
+            document.getElementById('mobile-status').innerText = "Saving...";
+
+            for (const [id, val] of Object.entries(entryChanges)) {
+                const s = currentStudents.find(stu => stu.docID === id);
+                if (!s) continue;
+
+                if (activeEntryType === 'scores') {
+                    // Update Score
+                    if (!s.scores) s.scores = {};
+                    if (!s.scores[term]) s.scores[term] = {};
+                    s.scores[term][activeEntryKey] = val;
+                    
+                    // Recalculate Grade
+                    const sc = s.scores[term];
+                    let sum=0, c=0;
+                    ['q1','q2','q3','q4','q5'].forEach(k => { if(sc[k]) { sum+=parseFloat(sc[k]); c++; }});
+                    const qAvg = c>0 ? sum/c : 0;
+                    const p = parseFloat(sc.proj)||0;
+                    const e = parseFloat(sc.exam)||0;
+                    const att = (s.attendance && s.attendance[term]) ? parseFloat(s.attendance[term]) : 0;
+                    
+                    const wQ = globalWeights.quiz/100, wP = globalWeights.project/100, wE = globalWeights.exam/100, wA = globalWeights.attendance/100;
+                    const final = Math.round((qAvg*wQ) + (p*wP) + (e*wE) + (att*wA));
+                    
+                    // Update Local & Batch
+                    if (!s.grades) s.grades = {};
+                    s.grades[term] = final;
+                    
+                    const updateObj = {};
+                    updateObj[`scores.${term}.${activeEntryKey}`] = val;
+                    updateObj[`grades.${term}`] = final;
+                    batch.update(window.doc(window.db, "students", id), updateObj);
+
+                } else if (activeEntryType === 'attendance') {
+                    // Update Log
+                    if (!s.attendance_logs) s.attendance_logs = {};
+                    if (!s.attendance_logs[term]) s.attendance_logs[term] = {};
+                    s.attendance_logs[term][activeEntryKey] = val;
+                    
+                    // Recalculate Percentage
+                    const logs = s.attendance_logs[term];
+                    const dates = Object.keys(logs).filter(d => logs[d]); // Only count logged dates
+                    let score = 0;
+                    dates.forEach(d => { if (logs[d] !== 'Absent') score++; });
+                    const percent = dates.length > 0 ? Math.round((score / dates.length) * 100) : 100;
+                    
+                    // Update Local & Batch
+                    if (!s.attendance) s.attendance = {};
+                    s.attendance[term] = percent;
+
+                    const updateObj = {};
+                    updateObj[`attendance_logs.${term}.${activeEntryKey}`] = val;
+                    updateObj[`attendance.${term}`] = percent;
+                    batch.update(window.doc(window.db, "students", id), updateObj);
+                }
+            }
+
+            try {
+                await batch.commit();
+                showToast("Saved Successfully");
+                document.getElementById('mobile-status').innerText = "All changes saved.";
+                entryChanges = {}; // Clear
+            } catch (e) {
+                showToast("Error saving: " + e.message, "error");
+            }
         }
-        window.saveScores = async function() {
-            const batch = window.writeBatch(window.db);
-            document.querySelectorAll('#table-body tr').forEach(r => {
-                const id = r.getAttribute('data-id');
-                const qs = r.querySelectorAll('.q-input');
-                const up = {};
-                up[`scores.${currentTerm}.q1`]=qs[0].value; up[`scores.${currentTerm}.q2`]=qs[1].value;
-                up[`scores.${currentTerm}.q3`]=qs[2].value; up[`scores.${currentTerm}.q4`]=qs[3].value;
-                up[`scores.${currentTerm}.q5`]=qs[4].value; up[`scores.${currentTerm}.proj`]=r.querySelector('.p-input').value;
-                up[`scores.${currentTerm}.exam`]=r.querySelector('.e-input').value; up[`grades.${currentTerm}`]=r.querySelector('.grade-cell').innerText;
-                batch.update(window.doc(window.db,"students",id), up);
-            });
-            await batch.commit(); showToast("Scores Saved");
-        }
+
+        // --- CSV Import ---
         window.processCSV = async function() {
             const f = document.getElementById('csv-file'); if(!f.files.length) return showToast("Select File", "error");
             const r = new FileReader();
-            
-            // Progress Bar Init
             const pBar = document.getElementById('import-progress-bar');
             const pContainer = document.getElementById('import-progress-container');
             const pText = document.getElementById('progress-percent');
-            pContainer.classList.remove('hidden');
-            pBar.style.width = '0%'; pText.innerText = '0%';
+            pContainer.classList.remove('hidden'); pBar.style.width = '0%'; pText.innerText = '0%';
 
             r.onload = async function(e) {
                 const lines = e.target.result.split(/\r?\n/);
@@ -802,30 +967,26 @@
                             uid:uid, password:cl(row[1]), name:cl(row[2]), subject:cl(row[3]), section:sec, course:cl(row[5]), status:cl(row[6])||'Active'
                         }, {merge:true});
                         c++;
-                        // Update Progress
                         const percent = Math.round((i / lines.length) * 100);
-                        pBar.style.width = percent + '%';
-                        pText.innerText = percent + '%';
+                        pBar.style.width = percent + '%'; pText.innerText = percent + '%';
                     } catch(err){console.error(err);}
                 }
                 showToast(`Uploaded ${c} records`);
                 document.getElementById('import-modal').classList.add('hidden');
-                pContainer.classList.add('hidden'); // Hide progress
+                pContainer.classList.add('hidden');
                 await fetchSectionsForDropdown();
             };
             r.readAsText(f.files[0]);
         }
-        
-        // --- STUDENT FUNCTIONS ---
+
+        // --- STUDENT PORTAL LOGIC ---
         function initStudentPortal() {
             if (allStudentSubjects.length === 0) return;
             const select = document.getElementById('student-subject-select');
             select.innerHTML = '';
             allStudentSubjects.forEach((sub, index) => {
                 const opt = document.createElement('option');
-                opt.value = index;
-                opt.text = `${sub.subject} (${sub.section})`;
-                select.appendChild(opt);
+                opt.value = index; opt.text = `${sub.subject} (${sub.section})`; select.appendChild(opt);
             });
             renderStudentPage(allStudentSubjects[0]);
         }
@@ -839,224 +1000,109 @@
             document.getElementById('lbl-prelim-w').innerText = `${globalWeights.prelim}%`;
             document.getElementById('lbl-mid-w').innerText = `${globalWeights.midterm}%`;
             document.getElementById('lbl-fin-w').innerText = `${globalWeights.finals}%`;
-
             const g = data.grades || {};
-            const p = parseFloat(g.prelim) || null;
-            const m = parseFloat(g.midterm) || null;
-            const f = parseFloat(g.finals) || null;
-
+            const p = parseFloat(g.prelim) || null; const m = parseFloat(g.midterm) || null; const f = parseFloat(g.finals) || null;
             document.getElementById('s-prelim').innerText = p !== null ? p : "--";
             document.getElementById('s-midterm').innerText = m !== null ? m : "--";
             document.getElementById('s-finals').innerText = f !== null ? f : "--";
-
-            const wP = globalWeights.prelim/100;
-            const wM = globalWeights.midterm/100;
-            const wF = globalWeights.finals/100;
-            if (p && m && f) {
-                const card = Math.round((p * wP) + (m * wM) + (f * wF));
-                document.getElementById('s-card').innerText = card;
-            } else { document.getElementById('s-card').innerText = "--"; }
-            
+            const wP = globalWeights.prelim/100, wM = globalWeights.midterm/100, wF = globalWeights.finals/100;
+            if (p && m && f) { document.getElementById('s-card').innerText = Math.round((p * wP) + (m * wM) + (f * wF)); } 
+            else { document.getElementById('s-card').innerText = "--"; }
             showStudentTerm('prelim', document.querySelector('.nav-link.active'));
             document.getElementById('target-grade-input').value = "";
             document.getElementById('f-prelim-box').classList.add('hidden');
             document.getElementById('f-midterm-box').classList.add('hidden');
             document.getElementById('f-finals-box').classList.add('hidden');
-            
-            // Initial call to hide or reset progress bars
-            updateProgressBars(null); 
+            updateProgressBars(null);
         }
         window.showStudentTerm = function(term, btn) {
             if (!activeStudentSubject) return;
-            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const container = document.getElementById('student-term-detail');
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active')); btn.classList.add('active');
             const data = activeStudentSubject;
             const scores = (data.scores && data.scores[term]) ? data.scores[term] : {};
             const att = (data.attendance && data.attendance[term]) ? data.attendance[term] : 0;
             const logs = (data.attendance_logs && data.attendance_logs[term]) ? data.attendance_logs[term] : {};
+            let sum=0, c=0; ['q1','q2','q3','q4','q5'].forEach(k => {if(scores[k]){sum+=parseFloat(scores[k]); c++;}});
+            const qAvg = c>0 ? (sum/c).toFixed(1) : '-';
             
-            container.innerHTML = `
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="card p-3 h-100 bg-white border-0 shadow-sm">
-                            <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Scores</h6>
-                            <table class="table table-sm table-borderless small">
-                                <tbody>
-                                    <tr><td class="text-muted">Quiz 1</td><td class="fw-bold text-end">${scores.q1 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 2</td><td class="fw-bold text-end">${scores.q2 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 3</td><td class="fw-bold text-end">${scores.q3 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 4</td><td class="fw-bold text-end">${scores.q4 || '-'}</td></tr>
-                                    <tr><td class="text-muted">Quiz 5</td><td class="fw-bold text-end">${scores.q5 || '-'}</td></tr>
-                                    <tr class="border-top"><td class="text-dark"><strong>Quiz Avg</strong></td><td class="text-primary text-end"><strong>${calcQuizAvg(scores)}</strong></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card p-3 h-100 bg-white border-0 shadow-sm">
-                            <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Components</h6>
-                            <table class="table table-sm table-borderless small">
-                                <tbody>
-                                    <tr><td class="text-muted">Project</td><td class="fw-bold text-end">${scores.proj || '-'}</td></tr>
-                                    <tr><td class="text-muted">Exam</td><td class="fw-bold text-end">${scores.exam || '-'}</td></tr>
-                                    <tr><td class="text-muted">Attendance</td><td class="fw-bold text-end d-flex align-items-center justify-content-end gap-2">${att} <button class="btn btn-outline-primary icon-btn" style="width:24px; height:24px; font-size:12px;" onclick="showAttModal('${term}')"><i class="bi bi-list-task"></i></button></td></tr>
-                                    <tr class="table-primary rounded"><td class="p-2 text-primary"><strong>${term.toUpperCase()}</strong></td><td class="p-2 text-primary text-end"><strong>${(data.grades && data.grades[term]) || '-'}</strong></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-            window.currentLogs = logs;
+            document.getElementById('student-term-detail').innerHTML = `
+                <div class="row g-4"><div class="col-md-6"><div class="card p-3 h-100 bg-white border-0 shadow-sm">
+                <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Scores</h6>
+                <table class="table table-sm table-borderless small"><tbody>
+                <tr><td class="text-muted">Quiz 1</td><td class="fw-bold text-end">${scores.q1 || '-'}</td></tr>
+                <tr><td class="text-muted">Quiz 2</td><td class="fw-bold text-end">${scores.q2 || '-'}</td></tr>
+                <tr><td class="text-muted">Quiz 3</td><td class="fw-bold text-end">${scores.q3 || '-'}</td></tr>
+                <tr><td class="text-muted">Quiz 4</td><td class="fw-bold text-end">${scores.q4 || '-'}</td></tr>
+                <tr><td class="text-muted">Quiz 5</td><td class="fw-bold text-end">${scores.q5 || '-'}</td></tr>
+                <tr class="border-top"><td class="text-dark"><strong>Quiz Avg</strong></td><td class="text-primary text-end"><strong>${qAvg}</strong></td></tr>
+                </tbody></table></div></div>
+                <div class="col-md-6"><div class="card p-3 h-100 bg-white border-0 shadow-sm">
+                <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Components</h6>
+                <table class="table table-sm table-borderless small"><tbody>
+                <tr><td class="text-muted">Project</td><td class="fw-bold text-end">${scores.proj || '-'}</td></tr>
+                <tr><td class="text-muted">Exam</td><td class="fw-bold text-end">${scores.exam || '-'}</td></tr>
+                <tr><td class="text-muted">Attendance</td><td class="fw-bold text-end d-flex align-items-center justify-content-end gap-2">${att}% <button class="btn btn-outline-primary icon-btn" style="width:24px; height:24px; font-size:12px;" onclick="window.currentLogs=activeStudentSubject.attendance_logs?.['${term}']; showAttModal()"><i class="bi bi-list-task"></i></button></td></tr>
+                <tr class="table-primary rounded"><td class="p-2 text-primary"><strong>${term.toUpperCase()}</strong></td><td class="p-2 text-primary text-end"><strong>${(data.grades && data.grades[term]) || '-'}</strong></td></tr>
+                </tbody></table></div></div></div>`;
         }
-        function calcQuizAvg(s) {
-            let sum=0, c=0;
-            ['q1','q2','q3','q4','q5'].forEach(k => {if(s[k]){sum+=parseFloat(s[k]); c++;}});
-            return c>0 ? (sum/c).toFixed(1) : '-';
-        }
-        window.showAttModal = function(term) {
-            const body = document.getElementById('att-modal-body');
-            const logs = window.currentLogs || {};
-            if (Object.keys(logs).length === 0) {
-                body.innerHTML = "<div class='p-3 text-center text-muted small'>No records found.</div>";
-            } else {
+        window.showAttModal = function() {
+            const body = document.getElementById('att-modal-body'); const logs = window.currentLogs || {};
+            if (Object.keys(logs).length === 0) { body.innerHTML = "<div class='p-3 text-center text-muted small'>No records found.</div>"; } 
+            else {
                 let html = "<table class='table table-hover mb-0 small'><thead class='table-light'><tr><th class='ps-4'>Date</th><th>Status</th></tr></thead><tbody>";
                 Object.keys(logs).sort().forEach(d => {
-                    const st = logs[d];
-                    const color = st==='Present'?'text-success':st==='Absent'?'text-danger':st==='Late'?'text-warning':'text-primary';
+                    const st = logs[d]; const color = st==='Present'?'text-success':st==='Absent'?'text-danger':st==='Late'?'text-warning':'text-primary';
                     html += `<tr><td class='ps-4'>${d}</td><td class="${color} fw-bold">${st}</td></tr>`;
                 });
-                html += "</tbody></table>";
-                body.innerHTML = html;
+                html += "</tbody></table>"; body.innerHTML = html;
             }
             new bootstrap.Modal(document.getElementById('attModal')).show();
         }
-        
-        // --- TARGET CALCULATION LOGIC UPDATED ---
         window.calculateForecast = function() {
             const target = parseFloat(document.getElementById('target-grade-input').value);
-            
-            // Helper: Returns numeric value or null if missing (treated as not yet entered)
-            const getVal = (id) => {
-                const txt = document.getElementById(id).innerText;
-                return (txt === "--" || isNaN(parseFloat(txt))) ? null : parseFloat(txt);
-            };
-
-            const p = getVal('s-prelim');
-            const m = getVal('s-midterm');
-            const f = getVal('s-finals'); // Usually missing if we are forecasting
-            
-            const prelimBox = document.getElementById('f-prelim-box');
-            const midBox = document.getElementById('f-midterm-box');
-            const finBox = document.getElementById('f-finals-box');
-            
-            const prelimVal = document.getElementById('f-prelim');
-            const midVal = document.getElementById('f-midterm');
-            const finVal = document.getElementById('f-finals');
-
-            // Reset UI
+            const getVal = (id) => { const txt = document.getElementById(id).innerText; return (txt === "--" || isNaN(parseFloat(txt))) ? null : parseFloat(txt); };
+            const p = getVal('s-prelim'); const m = getVal('s-midterm');
+            const prelimBox = document.getElementById('f-prelim-box'); const midBox = document.getElementById('f-midterm-box'); const finBox = document.getElementById('f-finals-box');
             prelimBox.classList.add('hidden'); midBox.classList.add('hidden'); finBox.classList.add('hidden');
-            
-            // Pass target to progress bars even if target is 0/empty to reset them
             updateProgressBars(target);
-
-            if (!target) return; 
-
-            const wP = globalWeights.prelim/100;
-            const wM = globalWeights.midterm/100;
-            const wF = globalWeights.finals/100;
+            if (!target) return;
+            const wP = globalWeights.prelim/100, wM = globalWeights.midterm/100, wF = globalWeights.finals/100;
+            const format = (v) => (v>100 ? "Impossible" : (v<0?0:v));
             
-            // --- SCENARIO 1: NO GRADES YET (Start of Semester) ---
             if (p === null && m === null) {
-                // Target = Needed * (wP + wM + wF)  => Needed = Target / 1
-                const needed = target; 
-                const rounded = Math.ceil(needed);
-                
-                // Show needed for ALL terms
+                const rounded = Math.ceil(target);
                 prelimBox.classList.remove('hidden'); midBox.classList.remove('hidden'); finBox.classList.remove('hidden');
-                
-                prelimVal.innerText = formatNeeded(rounded);
-                midVal.innerText = formatNeeded(rounded);
-                finVal.innerText = formatNeeded(rounded);
-                return;
-            }
-
-            // --- SCENARIO 2: PRELIM EXISTS, MIDTERM MISSING ---
-            if (p !== null && m === null) {
-                // Target = (P * wP) + (Needed * (wM + wF))
-                const currentPoints = p * wP;
-                const remainingWeight = wM + wF;
-                const needed = (target - currentPoints) / remainingWeight;
-                const rounded = Math.ceil(needed);
-                
+                document.getElementById('f-prelim').innerText = format(rounded);
+                document.getElementById('f-midterm').innerText = format(rounded);
+                document.getElementById('f-finals').innerText = format(rounded);
+            } else if (p !== null && m === null) {
+                const rounded = Math.ceil((target - (p * wP)) / (wM + wF));
                 midBox.classList.remove('hidden'); finBox.classList.remove('hidden');
-                midVal.innerText = formatNeeded(rounded);
-                finVal.innerText = formatNeeded(rounded);
-                return;
-            }
-
-            // --- SCENARIO 3: PRELIM & MIDTERM EXIST, FINALS MISSING ---
-            if (p !== null && m !== null) {
-                // Target = (P * wP) + (M * wM) + (Needed * wF)
-                const currentPoints = (p * wP) + (m * wM);
-                const needed = (target - currentPoints) / wF;
-                const rounded = Math.ceil(needed);
-                
+                document.getElementById('f-midterm').innerText = format(rounded);
+                document.getElementById('f-finals').innerText = format(rounded);
+            } else if (p !== null && m !== null) {
+                const rounded = Math.ceil((target - ((p * wP) + (m * wM))) / wF);
                 finBox.classList.remove('hidden');
-                finVal.innerText = formatNeeded(rounded);
-                return;
+                document.getElementById('f-finals').innerText = format(rounded);
             }
         }
-
-        function formatNeeded(val) {
-            if (val > 100) return "Impossible";
-            if (val < 0) return 0;
-            return val;
-        }
-
         function updateProgressBars(target) {
-            const ids = ['prelim', 'midterm', 'finals', 'card'];
-            
-            ids.forEach(term => {
+            ['prelim', 'midterm', 'finals', 'card'].forEach(term => {
                 const box = document.getElementById(`p-${term}-bar-box`);
                 const bar = document.getElementById(`p-${term}-bar`);
-                const valTxt = document.getElementById(`s-${term}`).innerText;
                 
-                // Only show progress if target is set AND we have a grade (for Card Grade progress is useful)
-                // OR if we want to show progress towards target even if grade is 0 (shows empty bar).
-                // Let's show it if target exists.
-                
-                if (!target || valTxt === "--") {
-                    box.classList.add('hidden');
-                    return;
-                }
+                // Safety check: if element doesn't exist, skip
+                if (!box || !bar) return;
 
+                const valTxt = document.getElementById(`s-${term}`).innerText;
+                if (!target || valTxt === "--") { box.classList.add('hidden'); return; }
                 box.classList.remove('hidden');
                 const current = parseFloat(valTxt) || 0;
-                
-                // Calculate percentage of target achieved. 
-                // e.g. Target 90, Current 45 -> 50%
-                // BUT logically, for a term grade, if I have 85 and target is 90, I am "close".
-                // Let's make the bar represent the grade value itself relative to 100, 
-                // but colored based on proximity to target.
-                
-                // Actually user asked: "how near the student is in achieving the calculated should-be term grade"
-                // This implies comparing Current Grade vs Target Grade.
-                
-                let percent = (current / target) * 100;
-                if (percent > 100) percent = 100;
-                
+                let percent = (current / target) * 100; if (percent > 100) percent = 100;
                 bar.style.width = percent + "%";
-                
-                // Color Logic
-                if (current >= target) {
-                    bar.style.backgroundColor = "var(--success-green)"; // On track
-                } else if (current >= target - 5) {
-                    bar.style.backgroundColor = "var(--warning-orange)"; // Close
-                } else {
-                    bar.style.backgroundColor = "var(--danger-red)"; // Far behind
-                }
+                if (current >= target) bar.style.backgroundColor = "var(--success-green)";
+                else if (current >= target - 5) bar.style.backgroundColor = "var(--warning-orange)";
+                else bar.style.backgroundColor = "var(--danger-red)";
             });
         }
     </script>
