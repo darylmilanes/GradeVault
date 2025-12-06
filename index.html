@@ -57,12 +57,12 @@
             100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* --- Custom Toast --- */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        /* --- Custom Toast (LEFT SIDE) --- */
+        #toast-container { position: fixed; top: 20px; left: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .custom-toast { background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); padding: 15px 20px; min-width: 300px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease; border-left: 5px solid var(--primary-blue); }
         .custom-toast.success { border-left-color: var(--success-green); }
         .custom-toast.error { border-left-color: var(--danger-red); }
-        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+        @keyframes slideIn { from { transform: translateX(-120%); } to { transform: translateX(0); } } /* Slide from left */
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
         /* Navbar */
@@ -170,7 +170,8 @@
         #login-section { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-container { width: 100%; max-width: 400px; padding: 35px 30px; background: rgba(255, 255, 255, 0.95); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 64, 128, 0.15); border-top: 6px solid var(--primary-blue); }
         .grade-cell { font-weight: 800; }
-        .failing-grade { color: var(--danger-red); background-color: #fff5f5; }
+        
+        /* Removed old failing grade style in favor of new JS color logic */
 
         /* Media Queries for Responsive */
         @media (max-width: 991px) {
@@ -260,7 +261,10 @@
                             </div>
                             <div class="col-md-3 col-12 d-flex gap-2">
                                 <!-- Dynamic Buttons appear here based on view mode -->
-                                <button id="btn-load-list" onclick="loadClassList()" class="btn btn-primary w-100 fw-bold">Load List</button>
+                                <button id="btn-load-list" onclick="loadClassList()" class="btn btn-primary w-100 fw-bold">
+                                    <span class="d-md-none d-xl-inline">Load List</span>
+                                    <span class="d-none d-md-inline d-xl-none">Load</span>
+                                </button>
                                 <button id="btn-log-records" onclick="openLogSelectionModal()" class="btn btn-success w-100 fw-bold hidden"><i class="bi bi-pencil-square"></i> Log</button>
                             </div>
                         </div>
@@ -359,7 +363,7 @@
                     <div class="card grade-card">
                         <div class="grade-label">Prelim</div>
                         <div class="grade-value" id="s-prelim">--</div>
-                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-prelim-w">--%</div>
+                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-prelim-w">25%</div>
                         <div class="forecast-box hidden" id="f-prelim-box"><div class="forecast-val" id="f-prelim">--</div></div>
                         <div class="card-progress-container hidden" id="p-prelim-bar-box"><div class="card-progress-bar" id="p-prelim-bar"></div></div>
                     </div>
@@ -368,7 +372,7 @@
                     <div class="card grade-card">
                         <div class="grade-label">Midterm</div>
                         <div class="grade-value" id="s-midterm">--</div>
-                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-mid-w">--%</div>
+                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-mid-w">35%</div>
                         <div class="forecast-box hidden" id="f-midterm-box"><div class="forecast-val" id="f-midterm">--</div></div>
                         <div class="card-progress-container hidden" id="p-midterm-bar-box"><div class="card-progress-bar" id="p-midterm-bar"></div></div>
                     </div>
@@ -377,15 +381,15 @@
                     <div class="card grade-card">
                         <div class="grade-label">Finals</div>
                         <div class="grade-value" id="s-finals">--</div>
-                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-fin-w">--%</div>
+                        <div class="badge bg-light text-muted border fw-normal" style="font-size:0.7em" id="lbl-fin-w">40%</div>
                         <div class="forecast-box hidden" id="f-finals-box"><div class="forecast-val" id="f-finals">--</div></div>
                         <div class="card-progress-container hidden" id="p-finals-bar-box"><div class="card-progress-bar" id="p-finals-bar"></div></div>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-6">
-                    <div class="card grade-card" style="border-top-color: var(--success-green); background: #f0fff4;">
-                        <div class="grade-label text-success">Total</div>
-                        <div class="grade-value text-success" id="s-card">--</div>
+                    <div class="card grade-card" id="card-grade-container" style="border-top-color: var(--success-green); background: #f0fff4;">
+                        <div class="grade-label" id="card-grade-label">Total</div>
+                        <div class="grade-value" id="s-card">--</div>
                         <div class="small text-muted mt-1" style="font-size:0.7em">Final Grade</div>
                         <div class="card-progress-container hidden" id="p-card-bar-box"><div class="card-progress-bar" id="p-card-bar"></div></div>
                     </div>
@@ -418,6 +422,13 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
+                    <div class="alert alert-info small mb-3">
+                        <strong>Note:</strong> Defaults are set to match the standard grading policy:
+                        <ul>
+                            <li>Quizzes: 20%, Project: 30%, Exam: 40%, Att: 10%</li>
+                            <li>Prelim: 25%, Midterm: 35%, Finals: 40%</li>
+                        </ul>
+                    </div>
                     <h6 class="text-primary fw-bold text-uppercase small mb-3">Component Weights (%)</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-6"><label class="form-label small">Quizzes</label><input type="number" id="w-quiz" class="form-control"></div>
@@ -518,7 +529,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyALyoSZFrB9odSuydyDvRkVGCDdDQa0Ub8",
@@ -535,6 +546,50 @@
         window.collection = collection; window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
         window.getDocs = getDocs; window.query = query; window.where = where; window.writeBatch = writeBatch;
         window.signInWithEmailAndPassword = signInWithEmailAndPassword; window.signOut = signOut;
+
+        // --- AUTH PERSISTENCE LOGIC ---
+        // Check for Admin Session
+        onAuthStateChanged(window.auth, async (user) => {
+            if (user && user.uid === ADMIN_UID) {
+                // Restore Admin Session
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('teacher-section').classList.remove('hidden');
+                await fetchSettings();
+                await fetchSectionsForDropdown();
+                showToast("Session Restored (Admin)");
+            }
+        });
+
+        // Check for Student Session (LocalStorage)
+        const storedStudentUID = localStorage.getItem('gv_student_uid');
+        if (storedStudentUID) {
+            // Restore Student Session
+            restoreStudentSession(storedStudentUID);
+        }
+
+        async function restoreStudentSession(uid) {
+            try {
+                await fetchSettings();
+                // Re-fetch student data based on stored UID
+                const q = query(collection(window.db, "students"), where("uid", "==", uid));
+                const snapshot = await getDocs(q);
+                
+                if (!snapshot.empty) {
+                    allStudentSubjects = [];
+                    snapshot.forEach(doc => { if (doc.data().status !== "Dropped") allStudentSubjects.push(doc.data()); });
+                    
+                    if (allStudentSubjects.length > 0) {
+                        document.getElementById('login-section').classList.add('hidden');
+                        document.getElementById('student-section').classList.remove('hidden');
+                        initStudentPortal();
+                        showToast("Session Restored");
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to restore student session", e);
+                localStorage.removeItem('gv_student_uid'); // Clear if invalid
+            }
+        }
     </script>
 
     <script>
@@ -543,14 +598,102 @@
         let existingDates = [];
         let allStudentSubjects = [];
         let activeStudentSubject = null;
-        let globalWeights = { quiz: 20, project: 30, exam: 40, attendance: 10, prelim: 25, midterm: 35, finals: 40 };
+        
+        let globalWeights = { 
+            quiz: 20, 
+            project: 30, 
+            exam: 40, 
+            attendance: 10, 
+            prelim: 25, 
+            midterm: 35, 
+            finals: 40 
+        };
 
         // For Mobile Entry
         let activeEntryType = null; // 'scores' or 'attendance'
-        let activeEntryKey = null; // 'q1', 'exam', '10/25', etc.
+        let activeEntryKey = null; // 'q1', 'exam', '10/25', 'att'
         let entryChanges = {}; // Stores temp changes before save
 
         const ADMIN_UID = "Xv71xkRee8grRRhpfO2WYKoQhEC2"; 
+
+        // --- CALCULATION LOGIC ---
+        
+        function getAttendanceScore(student, term) {
+            // 1. Try to get saved summary score first
+            if (student.attendance && student.attendance[term] !== undefined && student.attendance[term] !== "") {
+                return parseFloat(student.attendance[term]);
+            }
+            // 2. If no summary, try to calculate from logs on the fly
+            if (student.attendance_logs && student.attendance_logs[term]) {
+                const logs = student.attendance_logs[term];
+                const dates = Object.keys(logs).filter(d => logs[d]); // Valid entries
+                if (dates.length > 0) {
+                    let presentCount = 0;
+                    dates.forEach(d => { if (logs[d] !== 'Absent') presentCount++; });
+                    return Math.round((presentCount / dates.length) * 100);
+                }
+            }
+            // 3. Default to 0 if absolutely no data found
+            return 0;
+        }
+
+        function calculatePeriodGrade(scores, attendanceScore) {
+            // 1. Quizzes (20%)
+            let qSum = 0;
+            let qCount = 0;
+            ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(q => {
+                const val = scores[q];
+                if (val !== "" && val !== undefined && val !== null) {
+                    qSum += parseFloat(val);
+                    qCount++;
+                }
+            });
+            const qAvg = qCount > 0 ? qSum / qCount : 0;
+            const quizComp = qAvg * (globalWeights.quiz / 100);
+
+            // 2. Project (30%)
+            const projVal = parseFloat(scores.proj);
+            const projComp = (!isNaN(projVal) ? projVal : 0) * (globalWeights.project / 100);
+
+            // 3. Exam (40%)
+            const examVal = parseFloat(scores.exam);
+            const examComp = (!isNaN(examVal) ? examVal : 0) * (globalWeights.exam / 100);
+
+            // 4. Attendance (10%)
+            const attVal = parseFloat(attendanceScore);
+            const attComp = (!isNaN(attVal) ? attVal : 0) * (globalWeights.attendance / 100);
+
+            const total = quizComp + projComp + examComp + attComp;
+            
+            return total;
+        }
+
+        function calculateCardGrade(p, m, f) {
+            if (p === null && m === null && f === null) return null;
+            
+            const wP = globalWeights.prelim / 100;
+            const wM = globalWeights.midterm / 100;
+            const wF = globalWeights.finals / 100;
+
+            const pScore = p || 0;
+            const mScore = m || 0;
+            const fScore = f || 0;
+
+            const finalGrade = (pScore * wP) + (mScore * wM) + (fScore * wF);
+            return Math.round(finalGrade); // Return Integer
+        }
+
+        // --- NEW: Helper for Grade Coloring ---
+        function getGradeStyling(grade) {
+            if (grade === null || grade === "--" || grade === undefined) {
+                return { color: 'var(--text-muted)', bg: '#fff', border: 'var(--border-light)' };
+            }
+            const g = parseFloat(grade);
+            if (g < 74.5) return { color: '#c62828', bg: '#ffebee', border: '#ef9a9a' }; // Dark Red
+            if (g < 79.5) return { color: '#ef6c00', bg: '#fff3e0', border: '#ffcc80' }; // Dark Orange
+            if (g < 89.5) return { color: '#1565c0', bg: '#e3f2fd', border: '#90caf9' }; // Dark Blue
+            return { color: '#2e7d32', bg: '#e8f5e9', border: '#a5d6a7' }; // Green
+        }
 
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -562,7 +705,7 @@
             setTimeout(() => {
                 toast.style.animation = 'fadeOut 0.3s forwards';
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 1500); // CHANGED to 1.5s
         }
 
         async function handleLogin() {
@@ -591,6 +734,9 @@
                         allStudentSubjects = [];
                         snapshot.forEach(doc => { if (doc.data().status !== "Dropped") allStudentSubjects.push(doc.data()); });
                         if (allStudentSubjects.length === 0) throw new Error("No active subjects found.");
+                        
+                        localStorage.setItem('gv_student_uid', uidInput);
+
                         document.getElementById('login-section').classList.add('hidden');
                         document.getElementById('student-section').classList.remove('hidden');
                         initStudentPortal();
@@ -600,7 +746,11 @@
             } catch (error) { showToast(error.message, "error"); btn.disabled = false; spinner.classList.add('d-none'); }
         }
 
-        function logout() { window.signOut(window.auth).then(() => location.reload()).catch(() => location.reload()); }
+        function logout() { 
+            window.signOut(window.auth);
+            localStorage.removeItem('gv_student_uid');
+            location.reload(); 
+        }
 
         async function fetchSettings() {
             try {
@@ -642,7 +792,6 @@
             } catch (e) { showToast(e.message, "error"); }
         }
 
-        // --- TEACHER VIEW LOGIC UPDATED ---
         function toggleTeacherButtons() {
             const mode = document.getElementById('view-mode').value;
             const btnLoad = document.getElementById('btn-load-list');
@@ -683,7 +832,6 @@
             snapshot.forEach(doc => { let d = doc.data(); d.docID = doc.id; currentStudents.push(d); });
             currentStudents.sort((a, b) => a.name.localeCompare(b.name));
             
-            // Extract dates for table view
             const dateSet = new Set();
             currentStudents.forEach(s => {
                 if (s.attendance_logs && s.attendance_logs[currentTerm]) 
@@ -707,13 +855,17 @@
                     tbody.innerHTML += `<tr><td class="fw-bold text-primary">${s.name}</td><td>${s.uid}</td><td>${s.course}</td><td><span class="badge ${s.status === 'Active' ? 'bg-success' : 'bg-danger'}">${s.status}</span></td></tr>`;
                 });
             } else if (mode === 'scores') {
-                thead.innerHTML = `<tr><th class="sticky-col">Name</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Prj</th><th>Exm</th><th class="bg-light">Att%</th><th class="bg-light">Grd</th></tr>`;
+                thead.innerHTML = `<tr><th class="sticky-col">Name</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Prj</th><th>Exm</th><th class="bg-light">Att</th><th class="bg-light">Grd</th></tr>`;
                 students.forEach(s => {
                     if (s.status === "Dropped") return;
                     const sc = (s.scores && s.scores[term]) ? s.scores[term] : {};
-                    const g = (s.grades && s.grades[term]) ? s.grades[term] : "";
-                    const att = (s.attendance && s.attendance[term]) ? s.attendance[term] : 0;
-                    tbody.innerHTML += `<tr><td class="sticky-col">${s.name}</td><td>${sc.q1||'-'}</td><td>${sc.q2||'-'}</td><td>${sc.q3||'-'}</td><td>${sc.q4||'-'}</td><td>${sc.q5||'-'}</td><td>${sc.proj||'-'}</td><td>${sc.exam||'-'}</td><td class="text-center">${att}%</td><td class="grade-cell ${g<75&&g!==''?'failing-grade':''}">${g}</td></tr>`;
+                    const att = getAttendanceScore(s, term);
+                    const calculatedGrade = calculatePeriodGrade(sc, att);
+                    
+                    // NEW: Apply Color Logic to Grade Cell
+                    const style = getGradeStyling(calculatedGrade);
+                    
+                    tbody.innerHTML += `<tr><td class="sticky-col">${s.name}</td><td>${sc.q1||'-'}</td><td>${sc.q2||'-'}</td><td>${sc.q3||'-'}</td><td>${sc.q4||'-'}</td><td>${sc.q5||'-'}</td><td>${sc.proj||'-'}</td><td>${sc.exam||'-'}</td><td class="text-center">${att}</td><td class="grade-cell" style="color:${style.color}; font-weight:800;">${calculatedGrade.toFixed(2)}</td></tr>`;
                 });
             } else if (mode === 'attendance') {
                 let h = `<tr><th class="sticky-col">Name</th>`;
@@ -729,19 +881,16 @@
                          const color = val==='Present'?'text-success':val==='Absent'?'text-danger':val==='Late'?'text-warning':'text-primary';
                          r += `<td class="fw-bold ${color}">${val.substring(0,1)}</td>`;
                     });
-                    r += `<td class="text-center fw-bold">${(s.attendance && s.attendance[term])?s.attendance[term]:0}%</td></tr>`;
+                    const attVal = getAttendanceScore(s, term);
+                    r += `<td class="text-center fw-bold">${attVal}</td></tr>`;
                     tbody.innerHTML += r;
                 });
             }
         }
 
-        // --- NEW LOGIC FOR "LOG RECORDS" (NATIVE APP FEEL) ---
-
         window.openLogSelectionModal = async function() {
             const section = document.getElementById('section-select').value;
             if(!section) { showToast("Select Section first", "error"); return; }
-            
-            // Ensure data is loaded to know what's filled
             if(currentStudents.length === 0) await loadClassList();
             
             const mode = document.getElementById('view-mode').value;
@@ -761,13 +910,11 @@
             grid.innerHTML = '';
             
             components.forEach(comp => {
-                // Check if data exists for this component
                 let filledCount = 0;
                 currentStudents.forEach(s => {
                     if (s.scores && s.scores[currentTerm] && s.scores[currentTerm][comp]) filledCount++;
                 });
                 const hasData = filledCount > 0;
-                
                 grid.innerHTML += `<div class="comp-btn ${hasData?'has-data':''}" onclick="launchMobileEntry('scores', '${comp}')">${labels[comp]}</div>`;
             });
         }
@@ -783,23 +930,20 @@
 
         window.launchMobileEntry = function(type, key) {
             if (!key) return;
-            // Close modals
             bootstrap.Modal.getInstance(document.getElementById('scoreSelectModal'))?.hide();
             bootstrap.Modal.getInstance(document.getElementById('dateSelectModal'))?.hide();
 
             activeEntryType = type;
             activeEntryKey = key;
-            entryChanges = {}; // Reset changes
+            entryChanges = {}; 
 
-            // Set Header Info
             const section = document.getElementById('section-select').value;
             const term = document.getElementById('term-select').value;
-            const compLabel = type==='scores' ? key.toUpperCase() : `Att: ${key}`;
+            let compLabel = type === 'scores' ? key.toUpperCase() : `Att Log: ${key}`;
             
             document.getElementById('mobile-subtitle').innerText = `${section} - ${term.toUpperCase()}`;
             document.getElementById('mobile-title').innerText = compLabel;
 
-            // Render List
             const listContainer = document.getElementById('mobile-entry-list');
             listContainer.innerHTML = '';
 
@@ -810,8 +954,9 @@
                     <div><div class="entry-name">${s.name}</div><div class="entry-uid">${s.uid}</div></div>`;
                 
                 if (type === 'scores') {
-                    const val = (s.scores && s.scores[term] && s.scores[term][key]) ? s.scores[term][key] : '';
-                    html += `<input type="number" class="mobile-score-input" value="${val}" onchange="trackChange('${s.docID}', this.value)" onkeydown="handleMobileEnter(event, this)">`;
+                    // Standard Score Input
+                    let val = (s.scores && s.scores[term] && s.scores[term][key]) ? s.scores[term][key] : '';
+                    html += `<input type="number" class="mobile-score-input" value="${val}" placeholder="0-100" onchange="trackChange('${s.docID}', this.value)" onkeydown="handleMobileEnter(event, this)">`;
                 } else {
                     const logs = (s.attendance_logs && s.attendance_logs[term]) ? s.attendance_logs[term] : {};
                     const val = logs[key] || '';
@@ -826,7 +971,6 @@
                 listContainer.innerHTML += html;
             });
 
-            // Show UI
             document.getElementById('teacher-section').classList.add('hidden');
             document.getElementById('mobile-entry-page').classList.remove('hidden');
         }
@@ -839,7 +983,7 @@
                 if (idx < inputs.length - 1) {
                     inputs[idx + 1].focus();
                 } else {
-                    el.blur(); // Force change event
+                    el.blur(); 
                     saveMobileBatch();
                 }
             }
@@ -848,7 +992,7 @@
         window.closeMobileEntry = function() {
             document.getElementById('mobile-entry-page').classList.add('hidden');
             document.getElementById('teacher-section').classList.remove('hidden');
-            loadClassList(); // Refresh table view
+            loadClassList(); 
         }
 
         window.trackChange = function(docID, val) {
@@ -857,13 +1001,12 @@
         }
 
         window.toggleAtt = function(el, docID) {
-            // Remove active from siblings
             const siblings = el.parentElement.children;
             let newVal = el.getAttribute('data-val');
             
             if (el.classList.contains('active')) {
                 el.classList.remove('active');
-                newVal = ""; // Deselect
+                newVal = ""; 
             } else {
                 for (let btn of siblings) btn.classList.remove('active');
                 el.classList.add('active');
@@ -876,7 +1019,6 @@
             const term = currentTerm;
             
             if (Object.keys(entryChanges).length === 0) { showToast("No changes to save"); return; }
-            
             document.getElementById('mobile-status').innerText = "Saving...";
 
             for (const [id, val] of Object.entries(entryChanges)) {
@@ -884,22 +1026,14 @@
                 if (!s) continue;
 
                 if (activeEntryType === 'scores') {
-                    // Update Score
+                    // Standard Score Update
                     if (!s.scores) s.scores = {};
                     if (!s.scores[term]) s.scores[term] = {};
                     s.scores[term][activeEntryKey] = val;
                     
-                    // Recalculate Grade
-                    const sc = s.scores[term];
-                    let sum=0, c=0;
-                    ['q1','q2','q3','q4','q5'].forEach(k => { if(sc[k]) { sum+=parseFloat(sc[k]); c++; }});
-                    const qAvg = c>0 ? sum/c : 0;
-                    const p = parseFloat(sc.proj)||0;
-                    const e = parseFloat(sc.exam)||0;
-                    const att = (s.attendance && s.attendance[term]) ? parseFloat(s.attendance[term]) : 0;
-                    
-                    const wQ = globalWeights.quiz/100, wP = globalWeights.project/100, wE = globalWeights.exam/100, wA = globalWeights.attendance/100;
-                    const final = Math.round((qAvg*wQ) + (p*wP) + (e*wE) + (att*wA));
+                    // Recalculate Period Grade
+                    const att = getAttendanceScore(s, term); // Use smart getter
+                    const final = calculatePeriodGrade(s.scores[term], att);
                     
                     // Update Local & Batch
                     if (!s.grades) s.grades = {};
@@ -916,20 +1050,28 @@
                     if (!s.attendance_logs[term]) s.attendance_logs[term] = {};
                     s.attendance_logs[term][activeEntryKey] = val;
                     
-                    // Recalculate Percentage
+                    // Recalculate Attendance Score locally
                     const logs = s.attendance_logs[term];
-                    const dates = Object.keys(logs).filter(d => logs[d]); // Only count logged dates
+                    const dates = Object.keys(logs).filter(d => logs[d]); 
                     let score = 0;
                     dates.forEach(d => { if (logs[d] !== 'Absent') score++; });
-                    const percent = dates.length > 0 ? Math.round((score / dates.length) * 100) : 100;
+                    const percent = dates.length > 0 ? Math.round((score / dates.length) * 100) : 0; 
                     
+                    // Recalculate Period Grade with new Attendance
+                    if (!s.scores) s.scores = {};
+                    if (!s.scores[term]) s.scores[term] = {};
+                    const final = calculatePeriodGrade(s.scores[term], percent);
+
                     // Update Local & Batch
                     if (!s.attendance) s.attendance = {};
                     s.attendance[term] = percent;
+                    if (!s.grades) s.grades = {};
+                    s.grades[term] = final;
 
                     const updateObj = {};
                     updateObj[`attendance_logs.${term}.${activeEntryKey}`] = val;
                     updateObj[`attendance.${term}`] = percent;
+                    updateObj[`grades.${term}`] = final;
                     batch.update(window.doc(window.db, "students", id), updateObj);
                 }
             }
@@ -938,7 +1080,7 @@
                 await batch.commit();
                 showToast("Saved Successfully");
                 document.getElementById('mobile-status').innerText = "All changes saved.";
-                entryChanges = {}; // Clear
+                entryChanges = {}; 
             } catch (e) {
                 showToast("Error saving: " + e.message, "error");
             }
@@ -1000,14 +1142,55 @@
             document.getElementById('lbl-prelim-w').innerText = `${globalWeights.prelim}%`;
             document.getElementById('lbl-mid-w').innerText = `${globalWeights.midterm}%`;
             document.getElementById('lbl-fin-w').innerText = `${globalWeights.finals}%`;
+            
             const g = data.grades || {};
-            const p = parseFloat(g.prelim) || null; const m = parseFloat(g.midterm) || null; const f = parseFloat(g.finals) || null;
-            document.getElementById('s-prelim').innerText = p !== null ? p : "--";
-            document.getElementById('s-midterm').innerText = m !== null ? m : "--";
-            document.getElementById('s-finals').innerText = f !== null ? f : "--";
-            const wP = globalWeights.prelim/100, wM = globalWeights.midterm/100, wF = globalWeights.finals/100;
-            if (p && m && f) { document.getElementById('s-card').innerText = Math.round((p * wP) + (m * wM) + (f * wF)); } 
-            else { document.getElementById('s-card').innerText = "--"; }
+            
+            const prelimAtt = getAttendanceScore(data, 'prelim');
+            const p = calculatePeriodGrade(data.scores?.prelim || {}, prelimAtt);
+            
+            const midAtt = getAttendanceScore(data, 'midterm');
+            const m = calculatePeriodGrade(data.scores?.midterm || {}, midAtt);
+            
+            const finAtt = getAttendanceScore(data, 'finals');
+            const f = calculatePeriodGrade(data.scores?.finals || {}, finAtt);
+            
+            // Format and Set Colors for Terms
+            const setGrade = (id, val) => {
+                const el = document.getElementById(id);
+                if (val !== null && !isNaN(val)) {
+                    el.innerText = val.toFixed(2);
+                    el.style.color = getGradeStyling(val).color;
+                } else {
+                    el.innerText = "--";
+                    el.style.color = "var(--primary-blue)";
+                }
+            };
+
+            setGrade('s-prelim', p);
+            setGrade('s-midterm', m);
+            setGrade('s-finals', f);
+            
+            // Final Card Styling
+            const finalCard = calculateCardGrade(p, m, f);
+            const cardEl = document.getElementById('s-card');
+            const cardContainer = document.getElementById('card-grade-container');
+            const cardLabel = document.getElementById('card-grade-label');
+            
+            if (finalCard !== null) {
+                cardEl.innerText = finalCard; // Integer
+                const style = getGradeStyling(finalCard);
+                cardEl.style.color = style.color;
+                cardLabel.style.color = style.color;
+                cardContainer.style.borderTopColor = style.color;
+                cardContainer.style.backgroundColor = style.bg;
+            } else {
+                cardEl.innerText = "--";
+                // Reset to default style
+                cardEl.style.color = "var(--success-green)";
+                cardContainer.style.borderTopColor = "var(--success-green)";
+                cardContainer.style.backgroundColor = "#f0fff4";
+            }
+            
             showStudentTerm('prelim', document.querySelector('.nav-link.active'));
             document.getElementById('target-grade-input').value = "";
             document.getElementById('f-prelim-box').classList.add('hidden');
@@ -1020,11 +1203,24 @@
             document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active')); btn.classList.add('active');
             const data = activeStudentSubject;
             const scores = (data.scores && data.scores[term]) ? data.scores[term] : {};
-            const att = (data.attendance && data.attendance[term]) ? data.attendance[term] : 0;
-            const logs = (data.attendance_logs && data.attendance_logs[term]) ? data.attendance_logs[term] : {};
-            let sum=0, c=0; ['q1','q2','q3','q4','q5'].forEach(k => {if(scores[k]){sum+=parseFloat(scores[k]); c++;}});
+            
+            const att = getAttendanceScore(data, term);
+            
+            let sum=0, c=0; 
+            ['q1','q2','q3','q4','q5'].forEach(k => {
+                if(scores[k] !== "" && scores[k] !== undefined && scores[k] !== null) {
+                    sum+=parseFloat(scores[k]); c++;
+                }
+            });
             const qAvg = c>0 ? (sum/c).toFixed(1) : '-';
             
+            const qComp = (c>0 ? (sum/c) : 0) * (globalWeights.quiz/100);
+            const pComp = (parseFloat(scores.proj)||0) * (globalWeights.project/100);
+            const eComp = (parseFloat(scores.exam)||0) * (globalWeights.exam/100);
+            const aComp = (parseFloat(att)||0) * (globalWeights.attendance/100);
+
+            const termGrade = calculatePeriodGrade(scores, att);
+
             document.getElementById('student-term-detail').innerHTML = `
                 <div class="row g-4"><div class="col-md-6"><div class="card p-3 h-100 bg-white border-0 shadow-sm">
                 <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Scores</h6>
@@ -1037,12 +1233,13 @@
                 <tr class="border-top"><td class="text-dark"><strong>Quiz Avg</strong></td><td class="text-primary text-end"><strong>${qAvg}</strong></td></tr>
                 </tbody></table></div></div>
                 <div class="col-md-6"><div class="card p-3 h-100 bg-white border-0 shadow-sm">
-                <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Components</h6>
+                <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Computation</h6>
                 <table class="table table-sm table-borderless small"><tbody>
-                <tr><td class="text-muted">Project</td><td class="fw-bold text-end">${scores.proj || '-'}</td></tr>
-                <tr><td class="text-muted">Exam</td><td class="fw-bold text-end">${scores.exam || '-'}</td></tr>
-                <tr><td class="text-muted">Attendance</td><td class="fw-bold text-end d-flex align-items-center justify-content-end gap-2">${att}% <button class="btn btn-outline-primary icon-btn" style="width:24px; height:24px; font-size:12px;" onclick="window.currentLogs=activeStudentSubject.attendance_logs?.['${term}']; showAttModal()"><i class="bi bi-list-task"></i></button></td></tr>
-                <tr class="table-primary rounded"><td class="p-2 text-primary"><strong>${term.toUpperCase()}</strong></td><td class="p-2 text-primary text-end"><strong>${(data.grades && data.grades[term]) || '-'}</strong></td></tr>
+                <tr><td class="text-muted">Quizzes (${globalWeights.quiz}%)</td><td class="fw-bold text-end">${qComp.toFixed(1)}</td></tr>
+                <tr><td class="text-muted">Project (${globalWeights.project}%)</td><td class="fw-bold text-end">${pComp.toFixed(1)}</td></tr>
+                <tr><td class="text-muted">Exam (${globalWeights.exam}%)</td><td class="fw-bold text-end">${eComp.toFixed(1)}</td></tr>
+                <tr><td class="text-muted">Attendance (${globalWeights.attendance}%)</td><td class="fw-bold text-end d-flex align-items-center justify-content-end gap-2">${aComp.toFixed(1)} <button class="btn btn-outline-primary icon-btn" style="width:24px; height:24px; font-size:12px;" onclick="window.currentLogs=activeStudentSubject.attendance_logs?.['${term}']; showAttModal()"><i class="bi bi-list-task"></i></button></td></tr>
+                <tr class="table-primary rounded"><td class="p-2 text-primary"><strong>${term.toUpperCase()}</strong></td><td class="p-2 text-primary text-end"><strong>${termGrade.toFixed(2)}</strong></td></tr>
                 </tbody></table></div></div></div>`;
         }
         window.showAttModal = function() {
@@ -1091,7 +1288,6 @@
                 const box = document.getElementById(`p-${term}-bar-box`);
                 const bar = document.getElementById(`p-${term}-bar`);
                 
-                // Safety check: if element doesn't exist, skip
                 if (!box || !bar) return;
 
                 const valTxt = document.getElementById(`s-${term}`).innerText;
