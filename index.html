@@ -65,9 +65,12 @@
         @keyframes slideIn { from { transform: translateX(-120%); } to { transform: translateX(0); } } /* Slide from left */
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-        /* Navbar */
+        /* Navbar Styles Updated for Font Weights */
         .navbar { background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important; box-shadow: 0 4px 12px rgba(0, 64, 128, 0.15); padding: 0.8rem 0; }
-        .navbar-brand { color: white !important; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; }
+        .navbar-brand { color: white !important; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; }
+        .brand-text { font-weight: 800; } /* Thick font for GradeVault */
+        .brand-subtitle { font-weight: 400 !important; } /* Thinner font for Teacher/Student */
+        
         .logo-box { background: rgba(255,255,255,0.2); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
         .icon-btn { border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; }
 
@@ -222,6 +225,7 @@
                 <span class="navbar-brand">
                     <div class="logo-box"><i class="bi bi-mortarboard-fill"></i></div>
                     <span class="brand-text">GradeVault</span>
+                    <!-- Updated class: same styling as requested -->
                     <span class="brand-subtitle ms-2 small opacity-75">Teacher</span>
                 </span>
                 <button onclick="logout()" class="btn btn-outline-light icon-btn" title="Sign Out"><i class="bi bi-power"></i></button>
@@ -321,7 +325,8 @@
                             <span class="navbar-brand">
                                 <div class="logo-box"><i class="bi bi-mortarboard-fill"></i></div>
                                 <span class="brand-text">GradeVault</span>
-                                <span class="brand-subtitle">Student</span>
+                                <!-- Updated class: same styling as Teacher label -->
+                                <span class="brand-subtitle ms-2 small opacity-75">Student</span>
                             </span>
                             <button onclick="logout()" class="btn btn-outline-light icon-btn d-lg-none"><i class="bi bi-power"></i></button>
                         </div>
